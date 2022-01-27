@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-namespace GVK {
+namespace RG {
 
 Sampler::Sampler (VkDevice device, VkFilter filter, VkSamplerAddressMode addressMode)
     : device (device)
@@ -28,7 +28,7 @@ Sampler::Sampler (VkDevice device, VkFilter filter, VkSamplerAddressMode address
     createInfo.minLod                  = 0.0f;
     createInfo.maxLod                  = 0.0f;
 
-    if (GVK_ERROR (vkCreateSampler (device, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateSampler (device, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create texture sampler!");
     }
 }
@@ -40,4 +40,4 @@ Sampler::~Sampler ()
     handle = nullptr;
 }
 
-} // namespace GVK
+} // namespace RG

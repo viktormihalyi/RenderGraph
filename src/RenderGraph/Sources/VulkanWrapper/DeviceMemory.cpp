@@ -4,7 +4,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace GVK {
+namespace RG {
 
 static void LogMemoryOperation (const std::string& operation, const size_t allocationSize, const uint32_t memoryTypeIndex)
 {
@@ -51,7 +51,7 @@ DeviceMemory::DeviceMemory (VkDevice device, const size_t allocationSize, const 
     allocInfo.allocationSize       = allocationSize;
     allocInfo.memoryTypeIndex      = memoryTypeIndex;
 
-    if (GVK_ERROR (vkAllocateMemory (device, &allocInfo, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkAllocateMemory (device, &allocInfo, nullptr, &handle) != VK_SUCCESS)) {
         throw std::runtime_error ("failed to allocate memory");
     }
 
@@ -71,4 +71,4 @@ DeviceMemory::~DeviceMemory ()
 #endif
 }
 
-} // namespace GVK
+} // namespace RG

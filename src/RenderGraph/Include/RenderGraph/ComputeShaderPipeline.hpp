@@ -14,14 +14,14 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 enum class ShaderKind : uint8_t;
 class ShaderModule;
 class RenderPass;
 class ComputePipeline;
 class PipelineLayout;
 class DescriptorSetLayout;
-} // namespace GVK
+} // namespace RG
 
 namespace RG {
 
@@ -30,19 +30,19 @@ private:
     const VkDevice device;
 
 public:
-    std::unique_ptr<GVK::ShaderModule> computeShader;
+    std::unique_ptr<RG::ShaderModule> computeShader;
 
 public:
     struct RENDERGRAPH_DLL_EXPORT CompileSettings {
-        GVK::MovablePtr<VkDescriptorSetLayout> layout;
+        RG::MovablePtr<VkDescriptorSetLayout> layout;
         std::vector<VkAttachmentReference>     attachmentReferences;
         std::vector<VkAttachmentReference>     inputAttachmentReferences;
         std::vector<VkAttachmentDescription>   attachmentDescriptions;
     };
 
     struct RENDERGRAPH_DLL_EXPORT CompileResult {
-        std::unique_ptr<GVK::PipelineLayout>  pipelineLayout;
-        std::unique_ptr<GVK::ComputePipeline> pipeline;
+        std::unique_ptr<RG::PipelineLayout>  pipelineLayout;
+        std::unique_ptr<RG::ComputePipeline> pipeline;
 
         void Clear ();
     };
@@ -59,9 +59,9 @@ public:
 
     void Compile (CompileSettings&& settings);
 
-    void IterateShaders (const std::function<void(const GVK::ShaderModule&)> iterator) const;
+    void IterateShaders (const std::function<void(const RG::ShaderModule&)> iterator) const;
 
-    std::unique_ptr<GVK::DescriptorSetLayout> CreateDescriptorSetLayout (VkDevice device) const;
+    std::unique_ptr<RG::DescriptorSetLayout> CreateDescriptorSetLayout (VkDevice device) const;
 };
 
 } // namespace RG

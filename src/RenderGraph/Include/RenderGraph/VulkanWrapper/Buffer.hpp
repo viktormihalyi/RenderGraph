@@ -11,13 +11,13 @@
 #include "vk_mem_alloc.h"
 #pragma warning(pop)
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT Buffer : public VulkanObject {
 private:
     VmaAllocator                   allocator;
-    GVK::MovablePtr<VkBuffer>      handle;
-    GVK::MovablePtr<VmaAllocation> allocationHandle;
+    RG::MovablePtr<VkBuffer>      handle;
+    RG::MovablePtr<VmaAllocation> allocationHandle;
     size_t                         size;
 
 public:
@@ -77,6 +77,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -1,7 +1,7 @@
 #include "ImageView.hpp"
 
 
-namespace GVK {
+namespace RG {
 
 ImageViewBase::ImageViewBase (VkDevice device, VkImage image, VkFormat format, VkImageViewType viewType, uint32_t layerIndex, uint32_t layerCount)
     : device (device)
@@ -25,7 +25,7 @@ ImageViewBase::ImageViewBase (VkDevice device, VkImage image, VkFormat format, V
     createInfo.subresourceRange.layerCount     = layerCount;
 
     VkResult result = vkCreateImageView (device, &createInfo, nullptr, &handle);
-    if (GVK_ERROR (result != VK_SUCCESS)) {
+    if (RG_ERROR (result != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create swapchain image views");
     }
 }
@@ -103,4 +103,4 @@ ImageViewCube::ImageViewCube (VkDevice device, const Image& image, uint32_t laye
 {
 }
 
-} // namespace GVK
+} // namespace RG

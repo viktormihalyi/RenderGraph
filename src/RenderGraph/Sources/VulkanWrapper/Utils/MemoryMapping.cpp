@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-namespace GVK {
+namespace RG {
 
 
 MemoryMapping::MemoryMapping (VkDevice device, VkDeviceMemory memory, size_t offset, size_t size)
@@ -16,7 +16,7 @@ MemoryMapping::MemoryMapping (VkDevice device, VkDeviceMemory memory, size_t off
     , size (size)
     , mappedMemory (nullptr)
 {
-    if (GVK_ERROR (vkMapMemory (device, memory, offset, size, 0, &mappedMemory) != VK_SUCCESS)) {
+    if (RG_ERROR (vkMapMemory (device, memory, offset, size, 0, &mappedMemory) != VK_SUCCESS)) {
         throw std::runtime_error ("failed to map memory");
     }
 }
@@ -41,7 +41,7 @@ MemoryMapping::MemoryMapping (VmaAllocator allocator, VmaAllocation allocationHa
     vmaGetAllocationInfo (allocator, allocationHandle, &allocInfo);
     size = allocInfo.size;
 
-    if (GVK_ERROR (vmaMapMemory (allocator, allocationHandle, &mappedMemory) != VK_SUCCESS)) {
+    if (RG_ERROR (vmaMapMemory (allocator, allocationHandle, &mappedMemory) != VK_SUCCESS)) {
         throw std::runtime_error ("failed to map memory");
     }
 }
@@ -60,7 +60,7 @@ MemoryMapping::~MemoryMapping ()
 
 void MemoryMapping::Copy (const void* data, size_t copiedSize) const
 {
-    if (GVK_ERROR (copiedSize > size)) {
+    if (RG_ERROR (copiedSize > size)) {
         throw std::runtime_error ("overflow");
     }
 
@@ -68,4 +68,4 @@ void MemoryMapping::Copy (const void* data, size_t copiedSize) const
 }
 
 
-} // namespace GVK
+} // namespace RG

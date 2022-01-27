@@ -36,7 +36,7 @@ RenderGraph::RenderGraph ()
 
 void RenderGraph::CompileResources ()
 {
-    Utils::ForEach<Resource> (graphSettings.connectionSet.GetNodesByInsertionOrder (), [&] (std::shared_ptr<Resource>& res) {
+    RG::ForEach<Resource> (graphSettings.connectionSet.GetNodesByInsertionOrder (), [&] (std::shared_ptr<Resource>& res) {
         res->Compile (graphSettings);
     });
 }
@@ -108,7 +108,7 @@ Pass RenderGraph::GetFirstPass () const
     std::set<Operation*>    allOpSet;
     std::vector<Operation*> allOp;
 
-    Utils::ForEach<Operation> (graphSettings.connectionSet.GetNodesByInsertionOrder (), [&] (const std::shared_ptr<Operation>& op) {
+    RG::ForEach<Operation> (graphSettings.connectionSet.GetNodesByInsertionOrder (), [&] (const std::shared_ptr<Operation>& op) {
         const std::vector<std::shared_ptr<Resource>> opInputs = graphSettings.connectionSet.GetPointingHere<Resource> (op.get ());
 
         const bool allInputsAreFirstWrittenByThisOp = std::all_of (opInputs.begin (), opInputs.end (), [&] (const std::shared_ptr<Resource>& res) {
@@ -256,7 +256,7 @@ void RenderGraph::DebugPrint ()
 }
 
 
-Utils::CommandLineOnOffFlag printRenderGraphFlag { "--printRenderGraph", "Prints render graph passes, operatins, resources." };
+RG::CommandLineOnOffFlag printRenderGraphFlag { "--printRenderGraph", "Prints render graph passes, operatins, resources." };
 
 
 void RenderGraph::Compile (GraphSettings&& graphSettings_)
@@ -279,13 +279,13 @@ void RenderGraph::Compile (GraphSettings&& graphSettings_)
     imageLayoutSequence.clear ();
 
     for (Pass& p : passes) {
-        Utils::ForEach<ImageResource*> (p.GetAllInputs (), [&] (ImageResource* img) {
-            for (GVK::Image* image : img->GetImages ()) {
+        RG::ForEach<ImageResource*> (p.GetAllInputs (), [&] (ImageResource* img) {
+            for (RG::Image* image : img->GetImages ()) {
                 imageLayoutSequence[*image].push_back (img->GetInitialLayout ());
             }
         });
-        Utils::ForEach<ImageResource*> (p.GetAllOutputs (), [&] (ImageResource* img) {
-            for (GVK::Image* image : img->GetImages ()) {
+        RG::ForEach<ImageResource*> (p.GetAllOutputs (), [&] (ImageResource* img) {
+            for (RG::Image* image : img->GetImages ()) {
                 imageLayoutSequence[*image].push_back (img->GetInitialLayout ());
             }
         });
@@ -313,7 +313,7 @@ void RenderGraph::Compile (GraphSettings&& graphSettings_)
     commandBuffers.clear ();
 
     for (uint32_t frameIndex = 0; frameIndex < graphSettings.framesInFlight; ++frameIndex) {
-        GVK::CommandBuffer& currentCmdbuffer = commandBuffers.emplace_back (graphSettings.GetDevice ());
+        RG::CommandBuffer& currentCmdbuffer = commandBuffers.emplace_back (graphSettings.GetDevice ());
 
         currentCmdbuffer.SetName (*graphSettings.device, fmt::format ("CommandBuffer {}/{}", frameIndex, graphSettings.framesInFlight));
 
@@ -324,11 +324,11 @@ void RenderGraph::Compile (GraphSettings&& graphSettings_)
                 auto allInputs  = graphSettings.connectionSet.GetPointingHere<Resource> (op);
                 auto allOutputs = graphSettings.connectionSet.GetPointingTo<Resource> (op);
 
-                std::unique_ptr<GVK::CommandPipelineBarrier> barrier = std::make_unique<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,  // TODO maybe VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT?
+                std::unique_ptr<RG::CommandPipelineBarrier> barrier = std::make_unique<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,  // TODO maybe VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT?
                                                                                                                       VK_PIPELINE_STAGE_ALL_COMMANDS_BIT); // TODO maybe VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT?
                 barrier->AddMemoryBarrier (flushAllMemory);
-                Utils::ForEach<ImageResource> (allInputs, [&] (const std::shared_ptr<ImageResource>& img) {
-                    for (GVK::Image* image : img->GetImages (frameIndex)) {
+                RG::ForEach<ImageResource> (allInputs, [&] (const std::shared_ptr<ImageResource>& img) {
+                    for (RG::Image* image : img->GetImages (frameIndex)) {
                         const VkImageLayout currentLayout = imageLayoutSequence[*image].back ();
                         const VkImageLayout newLayout     = op->GetImageLayoutAtStartForInputs (*img);
                         barrier->AddImageMemoryBarrier (image->GetBarrier (currentLayout, newLayout, fullMask, fullMask));
@@ -336,8 +336,8 @@ void RenderGraph::Compile (GraphSettings&& graphSettings_)
                     }
                 });
 
-                Utils::ForEach<ImageResource> (allOutputs, [&] (const std::shared_ptr<ImageResource>& img) {
-                    for (GVK::Image* image : img->GetImages (frameIndex)) {
+                RG::ForEach<ImageResource> (allOutputs, [&] (const std::shared_ptr<ImageResource>& img) {
+                    for (RG::Image* image : img->GetImages (frameIndex)) {
                         const VkImageLayout currentLayout = imageLayoutSequence[*image].back ();
                         const VkImageLayout newLayout     = op->GetImageLayoutAtStartForOutputs (*img);
                         barrier->AddImageMemoryBarrier (image->GetBarrier (currentLayout, newLayout, fullMask, fullMask));
@@ -348,14 +348,14 @@ void RenderGraph::Compile (GraphSettings&& graphSettings_)
                 currentCmdbuffer.RecordCommand (std::move (barrier))
                     .SetName ("Transition for next Pass");
 
-                Utils::ForEach<ImageResource> (allInputs, [&] (const std::shared_ptr<ImageResource>& img) {
-                    for (GVK::Image* image : img->GetImages (frameIndex)) {
+                RG::ForEach<ImageResource> (allInputs, [&] (const std::shared_ptr<ImageResource>& img) {
+                    for (RG::Image* image : img->GetImages (frameIndex)) {
                         imageLayoutSequence[*image].push_back (op->GetImageLayoutAtEndForInputs (*img)); // TODO VkAttachmentDescription.finalLayout
                     }
                 });
 
-                Utils::ForEach<ImageResource> (allOutputs, [&] (const std::shared_ptr<ImageResource>& img) {
-                    for (GVK::Image* image : img->GetImages (frameIndex)) {
+                RG::ForEach<ImageResource> (allOutputs, [&] (const std::shared_ptr<ImageResource>& img) {
+                    for (RG::Image* image : img->GetImages (frameIndex)) {
                         imageLayoutSequence[*image].push_back (op->GetImageLayoutAtEndForOutputs (*img)); // TODO VkAttachmentDescription.finalLayout
                     }
                 });
@@ -367,12 +367,12 @@ void RenderGraph::Compile (GraphSettings&& graphSettings_)
         }
 
         {
-            std::unique_ptr<GVK::CommandPipelineBarrier> barrier = std::make_unique<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,  // TODO maybe VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT?
+            std::unique_ptr<RG::CommandPipelineBarrier> barrier = std::make_unique<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,  // TODO maybe VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT?
                                                                                                                   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT); // TODO maybe VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT?
             barrier->AddMemoryBarrier (flushAllMemory);
             for (Pass& p : passes) {
-                Utils::ForEach<ImageResource*> (p.GetAllInputs (), [&] (ImageResource* img) {
-                    for (GVK::Image* image : img->GetImages (frameIndex)) {
+                RG::ForEach<ImageResource*> (p.GetAllInputs (), [&] (ImageResource* img) {
+                    for (RG::Image* image : img->GetImages (frameIndex)) {
                         const VkImageLayout currentLayout = imageLayoutSequence[*image].back ();
                         barrier->AddImageMemoryBarrier (image->GetBarrier (currentLayout, img->GetInitialLayout (), fullMask, fullMask));
                     }
@@ -390,11 +390,11 @@ void RenderGraph::Compile (GraphSettings&& graphSettings_)
 
 void RenderGraph::Submit (uint32_t frameIndex, const std::vector<VkSemaphore>& waitSemaphores, const std::vector<VkSemaphore>& signalSemaphores, VkFence fenceToSignal)
 {
-    if (GVK_ERROR (!compiled)) {
+    if (RG_ERROR (!compiled)) {
         return;
     }
 
-    if (GVK_ERROR (frameIndex >= graphSettings.framesInFlight)) {
+    if (RG_ERROR (frameIndex >= graphSettings.framesInFlight)) {
         return;
     }
 
@@ -404,9 +404,9 @@ void RenderGraph::Submit (uint32_t frameIndex, const std::vector<VkSemaphore>& w
 }
 
 
-void RenderGraph::Present (uint32_t imageIndex, GVK::Swapchain& swapchain, const std::vector<VkSemaphore>& waitSemaphores)
+void RenderGraph::Present (uint32_t imageIndex, RG::Swapchain& swapchain, const std::vector<VkSemaphore>& waitSemaphores)
 {
-    GVK_ASSERT (swapchain.SupportsPresenting ());
+    RG_ASSERT (swapchain.SupportsPresenting ());
 
     // TODO itt present queue kene
     swapchain.Present (graphSettings.device->GetGraphicsQueue (), imageIndex, waitSemaphores);
@@ -415,7 +415,7 @@ void RenderGraph::Present (uint32_t imageIndex, GVK::Swapchain& swapchain, const
 
 uint32_t RenderGraph::GetPassCount () const
 {
-    GVK_ASSERT (compiled);
+    RG_ASSERT (compiled);
 
     return static_cast<uint32_t> (passes.size ());
 }

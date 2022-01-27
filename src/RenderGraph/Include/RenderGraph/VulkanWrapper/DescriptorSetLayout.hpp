@@ -7,12 +7,12 @@
 #include "RenderGraph/Utils/MovablePtr.hpp"
 #include "VulkanObject.hpp"
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ DescriptorSetLayout : public VulkanObject {
 private:
     VkDevice                               device;
-    GVK::MovablePtr<VkDescriptorSetLayout> handle;
+    RG::MovablePtr<VkDescriptorSetLayout> handle;
 
     std::vector<VkDescriptorSetLayoutBinding> bindings;
 
@@ -25,7 +25,7 @@ public:
         for (size_t i = 0; i < bindings.size (); ++i) {
             for (size_t j = 0; j < bindings.size (); ++j) {
                 if (i != j && bindings[i].binding == bindings[j].binding && (bindings[i].stageFlags ^ bindings[j].stageFlags) == 0) {
-                    GVK_BREAK_STR ("duplicate binding");
+                    RG_BREAK_STR ("duplicate binding");
                 }
             }
         }
@@ -35,7 +35,7 @@ public:
         layoutInfo.bindingCount                    = static_cast<uint32_t> (bindings.size ());
         layoutInfo.pBindings                       = bindings.data ();
 
-        if (GVK_ERROR (vkCreateDescriptorSetLayout (device, &layoutInfo, nullptr, &handle) != VK_SUCCESS)) {
+        if (RG_ERROR (vkCreateDescriptorSetLayout (device, &layoutInfo, nullptr, &handle) != VK_SUCCESS)) {
             throw std::runtime_error ("failed to create descriptor set layout!");
         }
     }
@@ -59,6 +59,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

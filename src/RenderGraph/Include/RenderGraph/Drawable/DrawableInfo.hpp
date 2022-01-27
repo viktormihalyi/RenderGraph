@@ -17,7 +17,7 @@ namespace RG {
 class VertexBufferList {
 private:
     template<typename T>
-    std::vector<T> Get (std::function<T (const std::shared_ptr<GVK::VertexBufferTransferableUntyped>&)> getterFunc) const
+    std::vector<T> Get (std::function<T (const std::shared_ptr<RG::VertexBufferTransferableUntyped>&)> getterFunc) const
     {
         std::vector<T> result;
 
@@ -29,23 +29,23 @@ private:
     }
 
 public:
-    std::vector<std::shared_ptr<GVK::VertexBufferTransferableUntyped>> vertexBuffers;
+    std::vector<std::shared_ptr<RG::VertexBufferTransferableUntyped>> vertexBuffers;
 
     VertexBufferList () = default;
 
-    VertexBufferList (std::vector<std::shared_ptr<GVK::VertexBufferTransferableUntyped>> vertexBuffers)
+    VertexBufferList (std::vector<std::shared_ptr<RG::VertexBufferTransferableUntyped>> vertexBuffers)
         : vertexBuffers (vertexBuffers)
     {
     }
 
-    void Add (std::shared_ptr<GVK::VertexBufferTransferableUntyped> vb)
+    void Add (std::shared_ptr<RG::VertexBufferTransferableUntyped> vb)
     {
         vertexBuffers.push_back (vb);
     }
 
     std::vector<VkBuffer> GetHandles () const
     {
-        return Get<VkBuffer> ([] (const std::shared_ptr<GVK::VertexBufferTransferableUntyped>& vb) {
+        return Get<VkBuffer> ([] (const std::shared_ptr<RG::VertexBufferTransferableUntyped>& vb) {
             return vb->buffer.GetBufferToBind ();
         });
     }
@@ -78,8 +78,8 @@ public:
     }
 
     DrawableInfo (const uint32_t                              instanceCount,
-                  const GVK::VertexBufferTransferableUntyped& vertexBuffer,
-                  const GVK::IndexBufferTransferable&         indexBuffer)
+                  const RG::VertexBufferTransferableUntyped& vertexBuffer,
+                  const RG::IndexBufferTransferable&         indexBuffer)
         : instanceCount (instanceCount)
         , vertexCount (static_cast<uint32_t> (vertexBuffer.data.size ()))
         , vertexBuffer ({ vertexBuffer.buffer.GetBufferToBind () })
@@ -89,7 +89,7 @@ public:
     }
 
     DrawableInfo (const uint32_t                              instanceCount,
-                  const GVK::VertexBufferTransferableUntyped& vertexBuffer)
+                  const RG::VertexBufferTransferableUntyped& vertexBuffer)
         : instanceCount (instanceCount)
         , vertexCount (static_cast<uint32_t> (vertexBuffer.data.size ()))
         , vertexBuffer ({ vertexBuffer.buffer.GetBufferToBind () })
@@ -113,12 +113,12 @@ public:
 
     virtual ~DrawableInfo () override = default;
 
-    void Record (GVK::CommandBuffer& commandBuffer) const override;
+    void Record (RG::CommandBuffer& commandBuffer) const override;
 };
 
 class DrawableInfoProvider : public Drawable {
 public:
-    virtual void Record (GVK::CommandBuffer& commandBuffer) const override { GetDrawRecordableInfo ().Record (commandBuffer); }
+    virtual void Record (RG::CommandBuffer& commandBuffer) const override { GetDrawRecordableInfo ().Record (commandBuffer); }
 
 private:
     virtual const DrawableInfo& GetDrawRecordableInfo () const = 0;

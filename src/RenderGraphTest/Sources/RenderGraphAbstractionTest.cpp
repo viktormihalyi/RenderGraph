@@ -28,7 +28,7 @@ using RenderGraphAbstractionTest = HeadlessTestEnvironment;
 
 TEST_F (RenderGraphAbstractionTest, NoRG)
 {
-    GVK::DeviceExtra& device = *env->deviceExtra;
+    RG::DeviceExtra& device = *env->deviceExtra;
 
     const std::string vertSrc = passThroughVertexShader;
 
@@ -58,26 +58,26 @@ void main () {
 }
     )");
 
-    GVK::Image2D renderTarget (*env->allocator,
-                               GVK::Image2D::MemoryLocation::GPU,
+    RG::Image2D renderTarget (*env->allocator,
+                               RG::Image2D::MemoryLocation::GPU,
                                512,
                                512,
                                VK_FORMAT_R8G8B8A8_SRGB,
                                VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
                                1);
 
-    GVK::ImageView2D renderTargetView (*env->device, renderTarget, 0, 1);
-    GVK::ImageView2D renderTargetView2 (*env->device, renderTarget, 0, 1);
+    RG::ImageView2D renderTargetView (*env->device, renderTarget, 0, 1);
+    RG::ImageView2D renderTargetView2 (*env->device, renderTarget, 0, 1);
 
-    GVK::DescriptorPool pool (device,
+    RG::DescriptorPool pool (device,
                               std::vector<VkDescriptorPoolSize> {
                                   { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1024 },
                                   { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1024 },
                               },
                               1);
 
-    GVK::DescriptorSetLayout setLayout (device, {});
-    GVK::DescriptorSet       set (device, pool, setLayout);
+    RG::DescriptorSetLayout setLayout (device, {});
+    RG::DescriptorSet       set (device, pool, setLayout);
 
     VkAttachmentDescription attDesc1 = {};
     attDesc1.flags                   = 0;
@@ -130,8 +130,8 @@ void main () {
     sp->Compile (std::move (shaderPipelineSettings));
     sp2->Compile (std::move (shaderPipelineSettings2));
 
-    GVK::Framebuffer fb (*env->device, *sp->compileResult.renderPass, { renderTargetView.operator VkImageView () }, 512, 512);
-    GVK::Framebuffer fb2 (*env->device, *sp2->compileResult.renderPass, { renderTargetView2.operator VkImageView () }, 512, 512);
+    RG::Framebuffer fb (*env->device, *sp->compileResult.renderPass, { renderTargetView.operator VkImageView () }, 512, 512);
+    RG::Framebuffer fb2 (*env->device, *sp2->compileResult.renderPass, { renderTargetView2.operator VkImageView () }, 512, 512);
 
     VkClearValue clearValue     = {};
     clearValue.color.float32[0] = 0.0f;
@@ -156,7 +156,7 @@ void main () {
                                    VK_ACCESS_TRANSFER_WRITE_BIT;
     flushAllMemory.dstAccessMask = flushAllMemory.srcAccessMask;
 
-    std::vector<GVK::CommandBuffer> commandBuffers;
+    std::vector<RG::CommandBuffer> commandBuffers;
 
     VkImageMemoryBarrier transition            = {};
     transition.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -175,31 +175,31 @@ void main () {
     transition.subresourceRange.layerCount     = 1;
 
     {
-        GVK::CommandBuffer commandBuffer (*env->device, *env->commandPool);
+        RG::CommandBuffer commandBuffer (*env->device, *env->commandPool);
 
         commandBuffer.Begin ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
-        commandBuffer.Record<GVK::CommandBeginRenderPass> (*sp->compileResult.renderPass, fb, VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
-        commandBuffer.Record<GVK::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *sp->compileResult.pipeline);
-        commandBuffer.Record<GVK::CommandDraw> (6, 1, 0, 0);
-        commandBuffer.Record<GVK::CommandEndRenderPass> ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
-        commandBuffer.Record<GVK::CommandBeginRenderPass> (*sp2->compileResult.renderPass, fb, VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
-        commandBuffer.Record<GVK::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *sp2->compileResult.pipeline);
-        commandBuffer.Record<GVK::CommandDraw> (6, 1, 0, 0);
-        commandBuffer.Record<GVK::CommandEndRenderPass> ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandBeginRenderPass> (*sp->compileResult.renderPass, fb, VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
+        commandBuffer.Record<RG::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *sp->compileResult.pipeline);
+        commandBuffer.Record<RG::CommandDraw> (6, 1, 0, 0);
+        commandBuffer.Record<RG::CommandEndRenderPass> ();
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandBeginRenderPass> (*sp2->compileResult.renderPass, fb, VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
+        commandBuffer.Record<RG::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *sp2->compileResult.pipeline);
+        commandBuffer.Record<RG::CommandDraw> (6, 1, 0, 0);
+        commandBuffer.Record<RG::CommandEndRenderPass> ();
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
         commandBuffer.End ();
 
         commandBuffers.push_back (std::move (commandBuffer));
     }
 
     {
-        GVK::SingleTimeCommand cmd (*env->device, *env->commandPool, *env->graphicsQueue);
+        RG::SingleTimeCommand cmd (*env->device, *env->commandPool, *env->graphicsQueue);
 
         transition.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         transition.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        cmd.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+        cmd.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                                                  VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                                                  std::vector<VkMemoryBarrier> { flushAllMemory },
                                                  std::vector<VkBufferMemoryBarrier> {},
@@ -209,9 +209,9 @@ void main () {
     env->graphicsQueue->Submit ({}, {}, commandBuffers, {}, VK_NULL_HANDLE);
     env->graphicsQueue->Wait ();
 
-    GVK::ImageData img (device, renderTarget, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    RG::ImageData img (device, renderTarget, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    GVK::ImageData refimg (ReferenceImagesFolder / "pink.png");
+    RG::ImageData refimg (ReferenceImagesFolder / "pink.png");
 
     EXPECT_TRUE (refimg == img);
 }
@@ -265,12 +265,12 @@ void main () {
     renderTarget->Compile (s);
 
     auto& aTable = renderOp->compileSettings.attachmentProvider;
-    aTable->table.push_back ({ "outColor", GVK::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_CLEAR, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
+    aTable->table.push_back ({ "outColor", RG::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_CLEAR, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
 
     s.connectionSet.Add (renderOp, renderTarget);
 
     auto& aTable2 = renderOp2->compileSettings.attachmentProvider;
-    aTable2->table.push_back ({ "outColor", GVK::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_LOAD, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
+    aTable2->table.push_back ({ "outColor", RG::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_LOAD, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
 
     s.connectionSet.Add (renderOp2, renderTarget);
 
@@ -301,7 +301,7 @@ void main () {
                                    VK_ACCESS_TRANSFER_WRITE_BIT;
     flushAllMemory.dstAccessMask = flushAllMemory.srcAccessMask;
 
-    std::vector<GVK::CommandBuffer> commandBuffers;
+    std::vector<RG::CommandBuffer> commandBuffers;
 
     VkImageMemoryBarrier transition            = {};
     transition.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -320,31 +320,31 @@ void main () {
     transition.subresourceRange.layerCount     = 1;
 
     {
-        GVK::CommandBuffer commandBuffer (*env->device, *env->commandPool);
+        RG::CommandBuffer commandBuffer (*env->device, *env->commandPool);
 
         commandBuffer.Begin ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
-        commandBuffer.Record<GVK::CommandBeginRenderPass> (*renderOp->compileSettings.pipeline->compileResult.renderPass, *renderOp->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
-        commandBuffer.Record<GVK::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp->compileSettings.pipeline->compileResult.pipeline);
-        commandBuffer.Record<GVK::CommandDraw> (6, 1, 0, 0);
-        commandBuffer.Record<GVK::CommandEndRenderPass> ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
-        commandBuffer.Record<GVK::CommandBeginRenderPass> (*renderOp2->compileSettings.pipeline->compileResult.renderPass, *renderOp2->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
-        commandBuffer.Record<GVK::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp2->compileSettings.pipeline->compileResult.pipeline);
-        commandBuffer.Record<GVK::CommandDraw> (6, 1, 0, 0);
-        commandBuffer.Record<GVK::CommandEndRenderPass> ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandBeginRenderPass> (*renderOp->compileSettings.pipeline->compileResult.renderPass, *renderOp->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
+        commandBuffer.Record<RG::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp->compileSettings.pipeline->compileResult.pipeline);
+        commandBuffer.Record<RG::CommandDraw> (6, 1, 0, 0);
+        commandBuffer.Record<RG::CommandEndRenderPass> ();
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandBeginRenderPass> (*renderOp2->compileSettings.pipeline->compileResult.renderPass, *renderOp2->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
+        commandBuffer.Record<RG::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp2->compileSettings.pipeline->compileResult.pipeline);
+        commandBuffer.Record<RG::CommandDraw> (6, 1, 0, 0);
+        commandBuffer.Record<RG::CommandEndRenderPass> ();
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
         commandBuffer.End ();
 
         commandBuffers.push_back (std::move (commandBuffer));
     }
 
     {
-        GVK::SingleTimeCommand cmd (*env->device, *env->commandPool, *env->graphicsQueue);
+        RG::SingleTimeCommand cmd (*env->device, *env->commandPool, *env->graphicsQueue);
 
         transition.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         transition.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        cmd.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+        cmd.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                                                  VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                                                  std::vector<VkMemoryBarrier> { flushAllMemory },
                                                  std::vector<VkBufferMemoryBarrier> {},
@@ -354,9 +354,9 @@ void main () {
     env->graphicsQueue->Submit ({}, {}, commandBuffers, {}, VK_NULL_HANDLE);
     env->graphicsQueue->Wait ();
 
-    GVK::ImageData img (GetDeviceExtra (), *renderTarget->images[0]->image, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    RG::ImageData img (GetDeviceExtra (), *renderTarget->images[0]->image, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    GVK::ImageData refimg (ReferenceImagesFolder / "pink.png");
+    RG::ImageData refimg (ReferenceImagesFolder / "pink.png");
 
     EXPECT_TRUE (refimg == img);
 }
@@ -408,12 +408,12 @@ void main () {
     s.device         = env->deviceExtra.get ();
 
     auto& aTable = renderOp->compileSettings.attachmentProvider;
-    aTable->table.push_back ({ "outColor", GVK::ShaderKind::Fragment, { renderTarget->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_CLEAR, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTarget->GetFinalLayout () } });
+    aTable->table.push_back ({ "outColor", RG::ShaderKind::Fragment, { renderTarget->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_CLEAR, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTarget->GetFinalLayout () } });
 
     s.connectionSet.Add (renderOp, renderTarget);
 
     auto& aTable2 = renderOp2->compileSettings.attachmentProvider;
-    aTable2->table.push_back ({ "outColor", GVK::ShaderKind::Fragment, { renderTarget->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_LOAD, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTarget->GetFinalLayout () } });
+    aTable2->table.push_back ({ "outColor", RG::ShaderKind::Fragment, { renderTarget->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_LOAD, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTarget->GetFinalLayout () } });
 
     s.connectionSet.Add (renderOp2, renderTarget);
 
@@ -445,7 +445,7 @@ void main () {
     flushAllMemory.dstAccessMask = flushAllMemory.srcAccessMask;
 
 
-    std::vector<GVK::CommandBuffer> commandBuffers;
+    std::vector<RG::CommandBuffer> commandBuffers;
 
     const VkImageMemoryBarrier transition = renderTarget->images[0]->image->GetBarrier (VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                                                                                         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -453,20 +453,20 @@ void main () {
                                                                                         flushAllMemory.srcAccessMask);
 
     {
-        GVK::CommandBuffer commandBuffer (*env->device, *env->commandPool);
+        RG::CommandBuffer commandBuffer (*env->device, *env->commandPool);
 
         commandBuffer.Begin ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
-        commandBuffer.Record<GVK::CommandBeginRenderPass> (*renderOp->compileSettings.pipeline->compileResult.renderPass, *renderOp->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
-        commandBuffer.Record<GVK::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp->compileSettings.pipeline->compileResult.pipeline);
-        commandBuffer.Record<GVK::CommandDraw> (6, 1, 0, 0);
-        commandBuffer.Record<GVK::CommandEndRenderPass> ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
-        commandBuffer.Record<GVK::CommandBeginRenderPass> (*renderOp2->compileSettings.pipeline->compileResult.renderPass, *renderOp2->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
-        commandBuffer.Record<GVK::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp2->compileSettings.pipeline->compileResult.pipeline);
-        commandBuffer.Record<GVK::CommandDraw> (6, 1, 0, 0);
-        commandBuffer.Record<GVK::CommandEndRenderPass> ();
-        commandBuffer.Record<GVK::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> {});
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandBeginRenderPass> (*renderOp->compileSettings.pipeline->compileResult.renderPass, *renderOp->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
+        commandBuffer.Record<RG::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp->compileSettings.pipeline->compileResult.pipeline);
+        commandBuffer.Record<RG::CommandDraw> (6, 1, 0, 0);
+        commandBuffer.Record<RG::CommandEndRenderPass> ();
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> { transition });
+        commandBuffer.Record<RG::CommandBeginRenderPass> (*renderOp2->compileSettings.pipeline->compileResult.renderPass, *renderOp2->compileResult.framebuffers[0], VkRect2D { { 0, 0 }, { 512, 512 } }, std::vector<VkClearValue> { clearValue }, VK_SUBPASS_CONTENTS_INLINE);
+        commandBuffer.Record<RG::CommandBindPipeline> (VK_PIPELINE_BIND_POINT_GRAPHICS, *renderOp2->compileSettings.pipeline->compileResult.pipeline);
+        commandBuffer.Record<RG::CommandDraw> (6, 1, 0, 0);
+        commandBuffer.Record<RG::CommandEndRenderPass> ();
+        commandBuffer.Record<RG::CommandPipelineBarrier> (VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, std::vector<VkMemoryBarrier> { flushAllMemory }, std::vector<VkBufferMemoryBarrier> {}, std::vector<VkImageMemoryBarrier> {});
         commandBuffer.End ();
 
         commandBuffers.push_back (std::move (commandBuffer));
@@ -482,9 +482,9 @@ void main () {
 
     env->graphicsQueue->Wait ();
 
-    GVK::ImageData img (GetDeviceExtra (), *renderTarget->images[0]->image, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    RG::ImageData img (GetDeviceExtra (), *renderTarget->images[0]->image, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    GVK::ImageData refimg (ReferenceImagesFolder / "pink.png");
+    RG::ImageData refimg (ReferenceImagesFolder / "pink.png");
 
     EXPECT_TRUE (refimg == img);
 }
@@ -492,7 +492,7 @@ void main () {
 
 TEST_F (RenderGraphAbstractionTest, FullRG)
 {
-    GVK::DeviceExtra& device = *env->deviceExtra;
+    RG::DeviceExtra& device = *env->deviceExtra;
 
     auto sp = std::make_unique<RG::ShaderPipeline> (device);
     sp->SetVertexShaderFromString (passThroughVertexShader);
@@ -531,12 +531,12 @@ void main () {
     s.device         = env->deviceExtra.get ();
 
     auto& aTable = renderOp->compileSettings.attachmentProvider;
-    aTable->table.push_back ({ "outColor", GVK::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_CLEAR, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
+    aTable->table.push_back ({ "outColor", RG::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_CLEAR, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
 
     s.connectionSet.Add (renderOp, renderTarget);
 
     auto& aTable2 = renderOp2->compileSettings.attachmentProvider;
-    aTable2->table.push_back ({ "outColor", GVK::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_LOAD, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
+    aTable2->table.push_back ({ "outColor", RG::ShaderKind::Fragment, { [] () -> VkFormat { return VK_FORMAT_R8G8B8A8_SRGB; }, VK_ATTACHMENT_LOAD_OP_LOAD, renderTarget->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL } });
 
     s.connectionSet.Add (renderOp2, renderTarget);
 
@@ -547,9 +547,9 @@ void main () {
     env->graphicsQueue->Submit ({}, {}, { &rg.commandBuffers[0] }, {}, VK_NULL_HANDLE);
     env->graphicsQueue->Wait ();
 
-    GVK::ImageData img (device, *renderTarget->images[0]->image, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    RG::ImageData img (device, *renderTarget->images[0]->image, 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    GVK::ImageData refimg (ReferenceImagesFolder / "pink.png");
+    RG::ImageData refimg (ReferenceImagesFolder / "pink.png");
 
     EXPECT_TRUE (refimg == img);
 }

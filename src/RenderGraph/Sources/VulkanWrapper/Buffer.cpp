@@ -3,7 +3,7 @@
 #include "spdlog/spdlog.h"
 
 
-namespace GVK {
+namespace RG {
 
 
 Buffer::Buffer (VmaAllocator allocator, size_t bufferSize, VkBufferUsageFlags usageFlags, MemoryLocation loc)
@@ -23,7 +23,7 @@ Buffer::Buffer (VmaAllocator allocator, size_t bufferSize, VkBufferUsageFlags us
         allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
     }
 
-    if (GVK_ERROR (vmaCreateBuffer (allocator, &bufferInfo, &allocInfo, &handle, &allocationHandle, nullptr) != VK_SUCCESS)) {
+    if (RG_ERROR (vmaCreateBuffer (allocator, &bufferInfo, &allocInfo, &handle, &allocationHandle, nullptr) != VK_SUCCESS)) {
         spdlog::critical ("VkBuffer creation failed.");
         throw std::runtime_error ("failed to create vma buffer");
     }
@@ -41,4 +41,4 @@ Buffer::~Buffer ()
     handle = nullptr;
 }
 
-} // namespace GVK
+} // namespace RG

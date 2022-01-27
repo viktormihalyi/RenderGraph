@@ -41,7 +41,7 @@ public:
             initialized = true;
             glfwInitHint (GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
             int result = glfwInit ();
-            if (GVK_ERROR (result != GLFW_TRUE)) {
+            if (RG_ERROR (result != GLFW_TRUE)) {
                 std::terminate ();
             }
             
@@ -112,7 +112,7 @@ GLFWWindowBase::GLFWWindowBase (size_t width, size_t height, const std::vector<s
 
     globalGLFWInitializer.EnsureInitialized ();
 
-    GVK_ASSERT (glfwVulkanSupported () == GLFW_TRUE);
+    RG_ASSERT (glfwVulkanSupported () == GLFW_TRUE);
 
     glfwWindowHint (GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint (GLFW_RESIZABLE, GLFW_TRUE);
@@ -133,7 +133,7 @@ GLFWWindowBase::GLFWWindowBase (size_t width, size_t height, const std::vector<s
 
     float xscale, yscale;
     glfwGetMonitorContentScale (primaryMonitor, &xscale, &yscale);
-    GVK_ASSERT (xscale == 1.f && yscale == 1.f); // TODO handle different content scale (window size != framebuffer size)
+    RG_ASSERT (xscale == 1.f && yscale == 1.f); // TODO handle different content scale (window size != framebuffer size)
 
     int virtual_xpos, virtual_ypos;
     glfwGetMonitorPos (primaryMonitor, &virtual_xpos, &virtual_ypos);
@@ -150,7 +150,7 @@ GLFWWindowBase::GLFWWindowBase (size_t width, size_t height, const std::vector<s
     }
 
     impl->window = glfwCreateWindow (static_cast<int> (impl->width), static_cast<int> (impl->height), "GearsVk", usedMonitor, nullptr);
-    if (GVK_ERROR (impl->window == nullptr)) {
+    if (RG_ERROR (impl->window == nullptr)) {
         throw std::runtime_error ("failed to create window");
     }
 
@@ -309,7 +309,7 @@ void GLFWWindowBase::Close ()
 
 void GLFWWindowBase::DoEventLoop (const DrawCallback& drawCallback)
 {
-    if (GVK_ERROR (impl->window == nullptr)) {
+    if (RG_ERROR (impl->window == nullptr)) {
         return;
     }
 
@@ -335,7 +335,7 @@ std::vector<const char*> GetGLFWInstanceExtensions ()
 
     uint32_t     glfwExtensionCount = 0;
     const char** glfwExtensions     = glfwGetRequiredInstanceExtensions (&glfwExtensionCount);
-    GVK_ASSERT (glfwExtensionCount != 0);
+    RG_ASSERT (glfwExtensionCount != 0);
 
     std::vector<const char*> result;
     for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
@@ -347,14 +347,14 @@ std::vector<const char*> GetGLFWInstanceExtensions ()
 
 VkSurfaceKHR GLFWWindowBase::GetSurface (VkInstance instance)
 {
-    GVK_ASSERT (impl->window != nullptr);
+    RG_ASSERT (impl->window != nullptr);
 
     if (impl->surface != VK_NULL_HANDLE) {
         return impl->surface;
     }
 
     VkResult result = glfwCreateWindowSurface (instance, impl->window, nullptr, &impl->surface);
-    if (GVK_ERROR (result != VK_SUCCESS)) {
+    if (RG_ERROR (result != VK_SUCCESS)) {
         throw std::runtime_error ("Failed to create glfw surface");
     }
 
@@ -401,7 +401,7 @@ void GLFWWindowBase::SetWindowMode (Mode mode)
         glfwSetWindowMonitor (impl->window, nullptr, 0, 0, 800, 600, GLFW_DONT_CARE);
         glfwSetWindowPos (impl->window, impl->posXWindowed, impl->posYWindowed);
     } else {
-        GVK_BREAK_STR ("unexpected window mode type");
+        RG_BREAK_STR ("unexpected window mode type");
     }
 
     impl->mode = mode;

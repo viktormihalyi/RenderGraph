@@ -8,12 +8,12 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT Framebuffer final : public VulkanObject {
 private:
     VkDevice                       device;
-    GVK::MovablePtr<VkFramebuffer> handle;
+    RG::MovablePtr<VkFramebuffer> handle;
     std::vector<ImageView2D>       attachments;
 
     uint32_t width;
@@ -38,6 +38,6 @@ public:
     operator VkFramebuffer () const { return handle; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

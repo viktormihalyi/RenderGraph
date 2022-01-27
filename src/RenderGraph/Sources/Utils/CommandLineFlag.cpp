@@ -6,7 +6,7 @@
 #include <vector>
 #include <memory>
 
-namespace Utils {
+namespace RG {
 
 class CommandLineFlagRegistry {
 public:
@@ -23,7 +23,7 @@ static void PrintCommandLineHelpMessage ();
 
 void CommandLineFlagRegistry::MatchAll (int argc, char** argv, bool printUnusedWarning)
 {
-    GVK_ASSERT (argc >= 1);
+    RG_ASSERT (argc >= 1);
 
     std::vector<bool> usedIndices (argc, false);
 
@@ -130,7 +130,7 @@ CommandLineOnOffFlag::CommandLineOnOffFlag (const std::vector<std::string>& flag
     , helpText (helpText)
     , on (false)
 {
-    if (GVK_ERROR (flags.empty ())) {
+    if (RG_ERROR (flags.empty ())) {
         throw std::runtime_error ("no flags provided");
     }
 }
@@ -159,7 +159,7 @@ std::string CommandLineOnOffFlag::GetHelpText ()
 }
 
 
-void CommandLineOnOffFlag::Match (int argc, char** argv, Utils::Matcher& matcher)
+void CommandLineOnOffFlag::Match (int argc, char** argv, RG::Matcher& matcher)
 {
     bool   found     = false;
     size_t nextIndex = 0;
@@ -195,7 +195,7 @@ CommandLineOnOffCallbackFlag::CommandLineOnOffCallbackFlag (const std::vector<st
 }
 
 
-void CommandLineOnOffCallbackFlag::Match (int argc, char** argv, Utils::Matcher& matcher)
+void CommandLineOnOffCallbackFlag::Match (int argc, char** argv, RG::Matcher& matcher)
 {
     CommandLineOnOffFlag::Match (argc, argv, matcher);
 
@@ -231,4 +231,4 @@ static void PrintCommandLineHelpMessage ()
     std::cout << std::endl;
 }
 
-} // namespace Utils
+} // namespace RG

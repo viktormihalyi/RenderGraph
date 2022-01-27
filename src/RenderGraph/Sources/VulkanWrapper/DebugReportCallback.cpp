@@ -4,7 +4,7 @@
 #include "Utils/Assert.hpp"
 #include "Utils/StaticInit.hpp"
 
-namespace GVK {
+namespace RG {
     
 static VkBool32 cb (VkDebugReportFlagsEXT      /* flags */,
                     VkDebugReportObjectTypeEXT /* objectType */,
@@ -31,7 +31,7 @@ DebugReportCallback::DebugReportCallback (VkInstance instance)
 
     VkResult result = GetVulkanFunction<PFN_vkCreateDebugReportCallbackEXT> (instance, "vkCreateDebugReportCallbackEXT") (instance, &createInfo, nullptr, &handle);
 
-    if (GVK_ERROR (result != VK_SUCCESS)) {
+    if (RG_ERROR (result != VK_SUCCESS)) {
         throw std::runtime_error ("Could not create VkDebugReportCallbackEXT.");
     }
 }
@@ -43,4 +43,4 @@ DebugReportCallback::~DebugReportCallback ()
     handle = nullptr;
 }
 
-} // namespace GVK
+} // namespace RG

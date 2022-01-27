@@ -8,13 +8,13 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT ImageViewBase : public VulkanObject {
 private:
     VkDevice                     device;
     VkFormat                     format;
-    GVK::MovablePtr<VkImageView> handle;
+    RG::MovablePtr<VkImageView> handle;
 
 public:
     ImageViewBase (VkDevice device, VkImage image, VkFormat format, VkImageViewType viewType, uint32_t layerIndex = 0, uint32_t layerCount = 1);
@@ -71,6 +71,6 @@ public:
     ImageViewCube (VkDevice device, const Image& image, uint32_t layerIndex = 0);
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

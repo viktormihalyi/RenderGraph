@@ -8,7 +8,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ SingleTimeCommand final : public CommandBuffer {
 private:
@@ -36,6 +36,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

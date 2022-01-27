@@ -7,12 +7,12 @@
 #include "RenderGraph/Utils/MovablePtr.hpp"
 #include "VulkanObject.hpp"
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ PipelineLayout : public VulkanObject {
 private:
     VkDevice                          device;
-    GVK::MovablePtr<VkPipelineLayout> handle;
+    RG::MovablePtr<VkPipelineLayout> handle;
 
     std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 
@@ -27,7 +27,7 @@ private:
         pipelineLayoutInfo.pushConstantRangeCount     = 0;       // Optional
         pipelineLayoutInfo.pPushConstantRanges        = nullptr; // Optional
 
-        if (GVK_ERROR (vkCreatePipelineLayout (device, &pipelineLayoutInfo, nullptr, &handle) != VK_SUCCESS)) {
+        if (RG_ERROR (vkCreatePipelineLayout (device, &pipelineLayoutInfo, nullptr, &handle) != VK_SUCCESS)) {
             throw std::runtime_error ("failed to create pipeline layout");
         }
 
@@ -61,6 +61,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

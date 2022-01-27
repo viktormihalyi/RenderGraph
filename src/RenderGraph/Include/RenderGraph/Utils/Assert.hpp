@@ -11,27 +11,27 @@
 
 
 #ifndef NDEBUG
-#define GVK_ASSERT(condition) (::Utils::detail::DebugBreakAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
-#define GVK_VERIFY(condition) (::Utils::detail::DebugBreakAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
-#define GVK_ERROR(condition) (::Utils::detail::DebugBreakAssertFunc (condition, false, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
-#define GVK_BREAK() (::Utils::detail::DebugBreakFunc ("Debug Break", "", { __FILE__, __LINE__, __func__ }))
-#define GVK_BREAK_STR(message) (::Utils::detail::DebugBreakFunc ("Debug Break", message, { __FILE__, __LINE__, __func__ }))
+#define RG_ASSERT(condition) (::RG::detail::DebugBreakAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
+#define RG_VERIFY(condition) (::RG::detail::DebugBreakAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
+#define RG_ERROR(condition) (::RG::detail::DebugBreakAssertFunc (condition, false, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
+#define RG_BREAK() (::RG::detail::DebugBreakFunc ("Debug Break", "", { __FILE__, __LINE__, __func__ }))
+#define RG_BREAK_STR(message) (::RG::detail::DebugBreakFunc ("Debug Break", message, { __FILE__, __LINE__, __func__ }))
 #elif defined(LOGASSERTS)
-#define GVK_ASSERT(condition) (::Utils::detail::LogAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
-#define GVK_VERIFY(condition) (::Utils::detail::LogAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
-#define GVK_ERROR(condition) (::Utils::detail::LogAssertFunc (condition, false, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
-#define GVK_BREAK() (::Utils::detail::LogDebugBreakFunc ("Debug Break", "", { __FILE__, __LINE__, __func__ }))
-#define GVK_BREAK_STR(message) (::Utils::detail::LogDebugBreakFunc ("Debug Break", message, { __FILE__, __LINE__, __func__ }))
+#define RG_ASSERT(condition) (::RG::detail::LogAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
+#define RG_VERIFY(condition) (::RG::detail::LogAssertFunc (condition, true, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
+#define RG_ERROR(condition) (::RG::detail::LogAssertFunc (condition, false, "Assertion Failed", #condition, { __FILE__, __LINE__, __func__ }))
+#define RG_BREAK() (::RG::detail::LogDebugBreakFunc ("Debug Break", "", { __FILE__, __LINE__, __func__ }))
+#define RG_BREAK_STR(message) (::RG::detail::LogDebugBreakFunc ("Debug Break", message, { __FILE__, __LINE__, __func__ }))
 #else
-#define GVK_ASSERT(condition)
-#define GVK_VERIFY(condition) ((bool)(condition))
-#define GVK_ERROR(condition) ((bool)(condition))
-#define GVK_BREAK()
-#define GVK_BREAK_STR(message)
+#define RG_ASSERT(condition)
+#define RG_VERIFY(condition) ((bool)(condition))
+#define RG_ERROR(condition) ((bool)(condition))
+#define RG_BREAK()
+#define RG_BREAK_STR(message)
 #endif
 
 
-namespace Utils {
+namespace RG {
 
 namespace detail {
 
@@ -62,7 +62,7 @@ inline bool DebugBreakAssertFunc (bool condition, const bool shouldBe, const cha
 
 } // namespace detail
 
-} // namespace Utils
+} // namespace RG
 
 
 #endif

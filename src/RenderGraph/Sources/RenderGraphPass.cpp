@@ -113,11 +113,11 @@ bool Pass::RemoveOutput (Operation* op, Resource* output)
     OperationIO* oIO = GetOperationIO (op);
     ResourceIO*  rIO = GetResourceIO (output);
 
-    if (GVK_ERROR (oIO == nullptr || rIO == nullptr)) {
+    if (RG_ERROR (oIO == nullptr || rIO == nullptr)) {
         return false;
     }
 
-    if (GVK_ERROR (!Contains (oIO->outputs, output) || !Contains (rIO->writers, op))) {
+    if (RG_ERROR (!Contains (oIO->outputs, output) || !Contains (rIO->writers, op))) {
         return false;
     }
 
@@ -136,11 +136,11 @@ bool Pass::RemoveInput (Operation* op, Resource* input)
     OperationIO* oIO = GetOperationIO (op);
     ResourceIO*  rIO = GetResourceIO (input);
 
-    if (GVK_ERROR (oIO == nullptr || rIO == nullptr)) {
+    if (RG_ERROR (oIO == nullptr || rIO == nullptr)) {
         return false;
     }
 
-    if (GVK_ERROR (!Contains (oIO->inputs, input) || !Contains (rIO->readers, op))) {
+    if (RG_ERROR (!Contains (oIO->inputs, input) || !Contains (rIO->readers, op))) {
         return false;
     }
 
@@ -186,7 +186,7 @@ bool Pass::RemoveOperationIO (OperationIO* op)
         }
     }
 
-    if (GVK_ERROR (!found))
+    if (RG_ERROR (!found))
         return false;
 
     const std::vector<Resource*> opOutputs = op->outputs;
@@ -212,7 +212,7 @@ bool Pass::AddOperationIO (OperationIO* op)
         }
     }
 
-    if (GVK_ERROR (found))
+    if (RG_ERROR (found))
         return false;
 
     for (Resource* output : op->outputs)

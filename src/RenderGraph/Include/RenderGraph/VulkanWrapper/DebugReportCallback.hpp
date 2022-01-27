@@ -7,7 +7,7 @@
 #include "RenderGraph/Utils/Noncopyable.hpp"
 #include "RenderGraph/RenderGraphExport.hpp"
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT DebugReportCallback : public VulkanObject {
 private:
@@ -25,6 +25,6 @@ public:
 
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

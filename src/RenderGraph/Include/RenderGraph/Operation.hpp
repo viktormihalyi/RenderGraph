@@ -22,7 +22,7 @@
 #include <vector>
 
 
-namespace GVK {
+namespace RG {
 class DeviceExtra;
 class DescriptorPool;
 class DescriptorSet;
@@ -30,7 +30,7 @@ class DescriptorSetLayout;
 class Framebuffer;
 class ImageView2D;
 class CommandBuffer;
-} // namespace GVK
+} // namespace RG
 
 namespace RG {
 class Resource;
@@ -46,9 +46,9 @@ namespace RG {
 class RENDERGRAPH_DLL_EXPORT Operation : public Node {
 public:
     struct RENDERGRAPH_DLL_EXPORT Descriptors {
-        std::unique_ptr<GVK::DescriptorPool>             descriptorPool;
-        std::unique_ptr<GVK::DescriptorSetLayout>        descriptorSetLayout;
-        std::vector<std::unique_ptr<GVK::DescriptorSet>> descriptorSets;
+        std::unique_ptr<RG::DescriptorPool>             descriptorPool;
+        std::unique_ptr<RG::DescriptorSetLayout>        descriptorSetLayout;
+        std::vector<std::unique_ptr<RG::DescriptorSet>> descriptorSets;
     };
 
     virtual ~Operation () override = default;
@@ -56,7 +56,7 @@ public:
     virtual void Compile (const GraphSettings&)                                                          = 0;
     virtual void CompileWithExtent (const GraphSettings& graphSettings, uint32_t width, uint32_t height) = 0;
 
-    virtual void Record (const ConnectionSet& connectionSet, uint32_t resourceIndex, GVK::CommandBuffer& commandBuffer) = 0;
+    virtual void Record (const ConnectionSet& connectionSet, uint32_t resourceIndex, RG::CommandBuffer& commandBuffer) = 0;
 
     // when record called, input images will be in GetImageLayoutAtStartForInputs ()
     // output images will be in GetImageLayoutAtStartForOutputs () layouts.
@@ -102,26 +102,26 @@ public:
     virtual void Compile (const GraphSettings&) override;
     virtual void CompileWithExtent (const GraphSettings&, uint32_t width, uint32_t height) override;
 
-    virtual void Record (const ConnectionSet& connectionSet, uint32_t resourceIndex, GVK::CommandBuffer& commandBuffer) override;
+    virtual void Record (const ConnectionSet& connectionSet, uint32_t resourceIndex, RG::CommandBuffer& commandBuffer) override;
 
     virtual VkImageLayout GetImageLayoutAtStartForInputs (Resource&) override
     {
-        GVK_BREAK ();
+        RG_BREAK ();
         throw std::runtime_error ("Compute shaders do not operate on images.");
     }
     virtual VkImageLayout GetImageLayoutAtEndForInputs (Resource&) override
     {
-        GVK_BREAK ();
+        RG_BREAK ();
         throw std::runtime_error ("Compute shaders do not operate on images.");
     }
     virtual VkImageLayout GetImageLayoutAtStartForOutputs (Resource&) override
     {
-        GVK_BREAK ();
+        RG_BREAK ();
         throw std::runtime_error ("Compute shaders do not operate on images.");
     }
     virtual VkImageLayout GetImageLayoutAtEndForOutputs (Resource&) override
     {
-        GVK_BREAK ();
+        RG_BREAK ();
         throw std::runtime_error ("Compute shaders do not operate on images.");
     }
 };
@@ -174,7 +174,7 @@ public:
         uint32_t                                       width;
         uint32_t                                       height;
         Descriptors                                    descriptors;
-        std::vector<std::unique_ptr<GVK::Framebuffer>> framebuffers;
+        std::vector<std::unique_ptr<RG::Framebuffer>> framebuffers;
     };
 
     CompileSettings compileSettings;
@@ -186,7 +186,7 @@ public:
 
     virtual void Compile (const GraphSettings&) override;
     virtual void CompileWithExtent (const GraphSettings&, uint32_t width, uint32_t height) override;
-    virtual void Record (const ConnectionSet& connectionSet, uint32_t imageIndex, GVK::CommandBuffer& commandBuffer) override;
+    virtual void Record (const ConnectionSet& connectionSet, uint32_t imageIndex, RG::CommandBuffer& commandBuffer) override;
 
     const std::unique_ptr<ShaderPipeline>& GetShaderPipeline () const { return compileSettings.pipeline; }
 

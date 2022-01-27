@@ -7,7 +7,8 @@
 
 #include "spdlog/spdlog.h"
 
-namespace SR {
+namespace RG {
+namespace Refl {
 
 static const std::vector<std::unique_ptr<Field>> emptyFieldVector;
 
@@ -70,11 +71,11 @@ uint32_t BufferView::GetOffset () const
 
 BufferView BufferView::operator[] (std::string_view str)
 {
-    if (GVK_ERROR (data == nullptr)) {
+    if (RG_ERROR (data == nullptr)) {
         return invalidUview;
     }
 
-    GVK_ASSERT (type != Type::Array);
+    RG_ASSERT (type != Type::Array);
 
     for (const std::unique_ptr<Field>& f : parentContainer.GetFields ()) {
         if (str == f->name) {
@@ -88,20 +89,20 @@ BufferView BufferView::operator[] (std::string_view str)
 
     spdlog::error ("No \"{}\" uniform named on \"{}\".", str, currentField->name);
 
-    GVK_BREAK ();
+    RG_BREAK ();
     return invalidUview;
 }
 
 
 BufferView BufferView::operator[] (uint32_t index)
 {
-    if (GVK_ERROR (data == nullptr)) {
+    if (RG_ERROR (data == nullptr)) {
         return invalidUview;
     }
 
-    GVK_ASSERT (type == Type::Array);
-    GVK_ASSERT (currentField != nullptr);
-    GVK_ASSERT (currentField->arraySize.size () > 0);
+    RG_ASSERT (type == Type::Array);
+    RG_ASSERT (currentField != nullptr);
+    RG_ASSERT (currentField->arraySize.size () > 0);
 
     const uint32_t maxArraySizeIndex = static_cast<uint32_t> (currentField->arraySize.size () - 1);
     if (currentField->IsMultiDimensionalArray () && nextArraySizeIndex < maxArraySizeIndex) {
@@ -175,7 +176,7 @@ BufferDataExternal::BufferDataExternal (const std::shared_ptr<BufferObject>& ubo
     , bytes (bytes)
     , size (size)
 {
-    GVK_ASSERT (ubo->GetFullSize () == size);
+    RG_ASSERT (ubo->GetFullSize () == size);
     memset (bytes, 0, size);
 }
 
@@ -227,4 +228,5 @@ std::shared_ptr<BufferObject> ShaderBufferData::GetUbo (std::string_view str)
     return ubos[index];
 }
 
-} // namespace SR
+} // namespace Refl
+} // namespace RG

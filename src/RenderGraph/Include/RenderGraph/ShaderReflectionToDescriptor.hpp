@@ -20,8 +20,8 @@ class RENDERGRAPH_DLL_EXPORT IDescriptorWriteInfoProvider {
 public:
     virtual ~IDescriptorWriteInfoProvider ();
 
-    virtual std::vector<VkDescriptorImageInfo>  GetDescriptorImageInfos (const std::string& name, GVK::ShaderKind shaderKind, uint32_t layerIndex, uint32_t frameIndex) = 0;
-    virtual std::vector<VkDescriptorBufferInfo> GetDescriptorBufferInfos (const std::string& name, GVK::ShaderKind shaderKind, uint32_t frameIndex)                     = 0;
+    virtual std::vector<VkDescriptorImageInfo>  GetDescriptorImageInfos (const std::string& name, RG::ShaderKind shaderKind, uint32_t layerIndex, uint32_t frameIndex) = 0;
+    virtual std::vector<VkDescriptorBufferInfo> GetDescriptorBufferInfos (const std::string& name, RG::ShaderKind shaderKind, uint32_t frameIndex)                     = 0;
 };
 
 
@@ -29,7 +29,7 @@ class RENDERGRAPH_DLL_EXPORT DescriptorWriteInfoTable : public IDescriptorWriteI
 public:
     struct ImageEntry {
         std::string                                     name;
-        GVK::ShaderKind                                 shaderKind;
+        RG::ShaderKind                                 shaderKind;
         std::function<VkSampler ()>                     sampler;
         std::function<VkImageView (uint32_t, uint32_t)> imageView;
         VkImageLayout                                   imageLayout;
@@ -37,7 +37,7 @@ public:
 
     struct BufferEntry {
         std::string                        name;
-        GVK::ShaderKind                    shaderKind;
+        RG::ShaderKind                    shaderKind;
         std::function<VkBuffer (uint32_t)> buffer;
         VkDeviceSize                       offset;
         VkDeviceSize                       range;
@@ -48,9 +48,9 @@ public:
 
     virtual ~DescriptorWriteInfoTable () override = default;
 
-    virtual std::vector<VkDescriptorImageInfo> GetDescriptorImageInfos (const std::string& name, GVK::ShaderKind shaderKind, uint32_t layerIndex, uint32_t frameIndex) override;
+    virtual std::vector<VkDescriptorImageInfo> GetDescriptorImageInfos (const std::string& name, RG::ShaderKind shaderKind, uint32_t layerIndex, uint32_t frameIndex) override;
 
-    virtual std::vector<VkDescriptorBufferInfo> GetDescriptorBufferInfos (const std::string& name, GVK::ShaderKind shaderKind, uint32_t frameIndex) override;
+    virtual std::vector<VkDescriptorBufferInfo> GetDescriptorBufferInfos (const std::string& name, RG::ShaderKind shaderKind, uint32_t frameIndex) override;
 };
 
 
@@ -63,16 +63,16 @@ public:
 
 
 RENDERGRAPH_DLL_EXPORT
-void WriteDescriptors (const GVK::ShaderModuleReflection& reflection,
+void WriteDescriptors (const RG::ShaderModuleReflection& reflection,
                        VkDescriptorSet                      dstSet,
                        uint32_t                             frameIndex,
-                       GVK::ShaderKind                      shaderKind,
+                       RG::ShaderKind                      shaderKind,
                        IDescriptorWriteInfoProvider&        infoProvider,
                        IUpdateDescriptorSets&               updateInterface);
 
 
 RENDERGRAPH_DLL_EXPORT
-std::vector<VkDescriptorSetLayoutBinding> GetLayout (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind);
+std::vector<VkDescriptorSetLayoutBinding> GetLayout (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind);
 
 } // namespace FromShaderReflection
 } // namespace RG

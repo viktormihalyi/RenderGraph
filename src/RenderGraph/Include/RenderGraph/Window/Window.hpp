@@ -18,24 +18,24 @@ class RENDERGRAPH_DLL_EXPORT Window : public Noncopyable, public Nonmovable {
 public:
     struct Events {
         // window events
-        GVK::Event<>                   shown;
-        GVK::Event<>                   hidden;
-        GVK::Event<>                   closed;
-        GVK::Event<>                   focused;
-        GVK::Event<>                   focusLost;
-        GVK::Event<uint32_t, uint32_t> resized;
-        GVK::Event<uint32_t, uint32_t> moved;
-        GVK::Event<>                   refresh;
+        RG::Event<>                   shown;
+        RG::Event<>                   hidden;
+        RG::Event<>                   closed;
+        RG::Event<>                   focused;
+        RG::Event<>                   focusLost;
+        RG::Event<uint32_t, uint32_t> resized;
+        RG::Event<uint32_t, uint32_t> moved;
+        RG::Event<>                   refresh;
 
         // user input
-        GVK::Event<int32_t>           keyPressed;
-        GVK::Event<int32_t>           keyReleased;
-        GVK::Event<int32_t, int32_t>   mouseMove;
-        GVK::Event<uint32_t, uint32_t> leftMouseButtonPressed;
-        GVK::Event<uint32_t, uint32_t> leftMouseButtonReleased;
-        GVK::Event<uint32_t, uint32_t> rightMouseButtonPressed;
-        GVK::Event<uint32_t, uint32_t> rightMouseButtonReleased;
-        GVK::Event<int32_t>            scroll;
+        RG::Event<int32_t>           keyPressed;
+        RG::Event<int32_t>           keyReleased;
+        RG::Event<int32_t, int32_t>   mouseMove;
+        RG::Event<uint32_t, uint32_t> leftMouseButtonPressed;
+        RG::Event<uint32_t, uint32_t> leftMouseButtonReleased;
+        RG::Event<uint32_t, uint32_t> rightMouseButtonPressed;
+        RG::Event<uint32_t, uint32_t> rightMouseButtonReleased;
+        RG::Event<int32_t>            scroll;
     } events;
 
 public:

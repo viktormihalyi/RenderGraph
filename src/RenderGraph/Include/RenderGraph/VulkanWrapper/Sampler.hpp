@@ -7,12 +7,12 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT Sampler : public VulkanObject {
 private:
     VkDevice                   device;
-    GVK::MovablePtr<VkSampler> handle;
+    RG::MovablePtr<VkSampler> handle;
     VkFilter                   filter;
 
 public:
@@ -30,6 +30,6 @@ public:
     operator VkSampler () const { return handle; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -4,7 +4,7 @@
 #include <string>
 
 
-namespace Utils {
+namespace RG {
 
 
 std::vector<std::string> SplitString (const std::string& str, const char delim, const bool keepEmpty)
@@ -88,4 +88,4 @@ bool StringContains (const std::string& str, const std::string& substr)
 }
 
 
-} // namespace Utils
+} // namespace RG

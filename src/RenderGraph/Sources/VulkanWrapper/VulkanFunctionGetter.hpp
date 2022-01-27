@@ -16,7 +16,7 @@ FunctionType GetVulkanFunction (VkInstance instance, const char* functionName)
 {
     FunctionType func = reinterpret_cast<FunctionType> (vkGetInstanceProcAddr (instance, functionName));
 
-    if (GVK_ERROR (func == nullptr)) {
+    if (RG_ERROR (func == nullptr)) {
         spdlog::error ("Failed to load Vulkan function \"{}\".", functionName);
         throw std::runtime_error ("Function not loaded.");
     }

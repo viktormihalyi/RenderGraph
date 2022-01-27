@@ -20,13 +20,13 @@
 #include <iomanip>
 
 
-static Utils::CommandLineOnOffFlag disableValidationLayersFlag (std::vector<std::string> { "--disableValidationLayers", "-v" }, "Disables Vulkan validation layers.");
-static Utils::CommandLineOnOffFlag logVulkanVersionFlag ("--logVulkanVersion");
+static RG::CommandLineOnOffFlag disableValidationLayersFlag (std::vector<std::string> { "--disableValidationLayers", "-v" }, "Disables Vulkan validation layers.");
+static RG::CommandLineOnOffFlag logVulkanVersionFlag ("--logVulkanVersion");
 
 
 namespace RG {
 
-Presentable::Presentable (VulkanEnvironment& env, std::unique_ptr<GVK::Surface>&& surface, std::unique_ptr<GVK::SwapchainSettingsProvider>&& settingsProvider)
+Presentable::Presentable (VulkanEnvironment& env, std::unique_ptr<RG::Surface>&& surface, std::unique_ptr<RG::SwapchainSettingsProvider>&& settingsProvider)
     : surface (std::move (surface))
     , window (nullptr)
 {
@@ -35,32 +35,32 @@ Presentable::Presentable (VulkanEnvironment& env, std::unique_ptr<GVK::Surface>&
     // but we create a physicaldevice first and create the swapchains later
     // so we _hope_ it is supported
 
-    GVK_VERIFY (env.CheckForPhsyicalDeviceSupport (*this));
+    RG_VERIFY (env.CheckForPhsyicalDeviceSupport (*this));
 
-    swapchain = std::make_unique<GVK::RealSwapchain> (*env.physicalDevice, *env.device, *this->surface, std::move (settingsProvider));
+    swapchain = std::make_unique<RG::RealSwapchain> (*env.physicalDevice, *env.device, *this->surface, std::move (settingsProvider));
 }
 
 
-Presentable::Presentable (VulkanEnvironment& env, Window& window, std::unique_ptr<GVK::SwapchainSettingsProvider>&& settingsProvider)
-    : Presentable (env, std::make_unique<GVK::Surface> (*env.instance, window.GetSurface (*env.instance)), std::move (settingsProvider))
+Presentable::Presentable (VulkanEnvironment& env, Window& window, std::unique_ptr<RG::SwapchainSettingsProvider>&& settingsProvider)
+    : Presentable (env, std::make_unique<RG::Surface> (*env.instance, window.GetSurface (*env.instance)), std::move (settingsProvider))
 {
 }
 
 
-Presentable::Presentable (VulkanEnvironment& env, std::unique_ptr<Window>&& window, std::unique_ptr<GVK::SwapchainSettingsProvider>&& settingsProvider)
-    : Presentable (env, std::make_unique<GVK::Surface> (*env.instance, window->GetSurface (*env.instance)), std::move (settingsProvider))
+Presentable::Presentable (VulkanEnvironment& env, std::unique_ptr<Window>&& window, std::unique_ptr<RG::SwapchainSettingsProvider>&& settingsProvider)
+    : Presentable (env, std::make_unique<RG::Surface> (*env.instance, window->GetSurface (*env.instance)), std::move (settingsProvider))
 {
     this->window = std::move (window);
 }
 
 
-GVK::Swapchain& Presentable::GetSwapchain ()
+RG::Swapchain& Presentable::GetSwapchain ()
 {
     return *swapchain;
 }
 
 
-const GVK::Surface& Presentable::GetSurface () const
+const RG::Surface& Presentable::GetSurface () const
 {
     return *surface;
 }
@@ -74,7 +74,7 @@ bool Presentable::HasWindow () const
 
 Window& Presentable::GetWindow ()
 {
-    GVK_ASSERT (window != nullptr);
+    RG_ASSERT (window != nullptr);
     return *window;
 }
 
@@ -163,12 +163,12 @@ void defaultDebugCallback (VkDebugUtilsMessageSeverityFlagBitsEXT      messageSe
         const std::string messageStr (callbackData->pMessage);
         
         const size_t firstDividerPos = messageStr.find ("|");
-        GVK_ASSERT (firstDividerPos != std::string::npos);
+        RG_ASSERT (firstDividerPos != std::string::npos);
 
         const std::string postFirstDivider = messageStr.substr (firstDividerPos + 2);
 
         const size_t secondDividerPos = postFirstDivider.find ("|");
-        GVK_ASSERT (secondDividerPos != std::string::npos);
+        RG_ASSERT (secondDividerPos != std::string::npos);
 
         const std::string postSecondDivider = postFirstDivider.substr (secondDividerPos + 2);
 
@@ -186,7 +186,7 @@ void defaultDebugCallback (VkDebugUtilsMessageSeverityFlagBitsEXT      messageSe
         if (value & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
             return "ERROR";
 
-        GVK_BREAK ();
+        RG_BREAK ();
         return "unknown";
     };
 
@@ -198,7 +198,7 @@ void defaultDebugCallback (VkDebugUtilsMessageSeverityFlagBitsEXT      messageSe
         if (value & VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT)
             return "PERFORMANCE";
 
-        GVK_BREAK ();
+        RG_BREAK ();
         return "unknown";
     };
     
@@ -226,7 +226,7 @@ void defaultDebugCallback (VkDebugUtilsMessageSeverityFlagBitsEXT      messageSe
         message += "\n";
     }
 
-    GVK_ASSERT (callbackData->cmdBufLabelCount == 0);
+    RG_ASSERT (callbackData->cmdBufLabelCount == 0);
 
     spdlog::info (message);
 }
@@ -243,25 +243,25 @@ DebugOnlyStaticInit apiVersionLogger ([] () {
     if (logVulkanVersionFlag.IsFlagOn ()) {
         uint32_t apiVersion;
         vkEnumerateInstanceVersion (&apiVersion);
-        spdlog::info ("vulkan api version: {}", GVK::GetVersionString (apiVersion));
+        spdlog::info ("vulkan api version: {}", RG::GetVersionString (apiVersion));
     }
 });
 
 
-VulkanEnvironment::VulkanEnvironment (std::optional<GVK::DebugUtilsMessenger::Callback> callback, const std::vector<const char*>& instanceExtensions, const std::vector<const char*>& deviceExtensions)
+VulkanEnvironment::VulkanEnvironment (std::optional<RG::DebugUtilsMessenger::Callback> callback, const std::vector<const char*>& instanceExtensions, const std::vector<const char*>& deviceExtensions)
 {
-    GVK::InstanceSettings is = (IsDebugBuild) ? GVK::instanceDebugMode : GVK::instanceReleaseMode;
+    RG::InstanceSettings is = (IsDebugBuild) ? RG::instanceDebugMode : RG::instanceReleaseMode;
     is.extensions.insert (is.extensions.end (), instanceExtensions.begin (), instanceExtensions.end ());
 
-    instance = std::make_unique<GVK::Instance> (is);
+    instance = std::make_unique<RG::Instance> (is);
 
     if constexpr (IsDebugBuild)
         if (callback.has_value () && !disableValidationLayersFlag.IsFlagOn ())
-            messenger = std::make_unique<GVK::DebugUtilsMessenger> (*instance, *callback, GVK::DebugUtilsMessenger::noPerformance);
+            messenger = std::make_unique<RG::DebugUtilsMessenger> (*instance, *callback, RG::DebugUtilsMessenger::noPerformance);
 
     const VkSurfaceKHR physicalDeviceSurfaceHandle = VK_NULL_HANDLE;
 
-    physicalDevice = std::make_unique<GVK::PhysicalDevice> (*instance, physicalDeviceSurfaceHandle, std::set<std::string> {});
+    physicalDevice = std::make_unique<RG::PhysicalDevice> (*instance, physicalDeviceSurfaceHandle, std::set<std::string> {});
 
     if (logVulkanVersionFlag.IsFlagOn ()) {
         VkPhysicalDeviceProperties properties = physicalDevice->GetProperties ();
@@ -274,14 +274,14 @@ VulkanEnvironment::VulkanEnvironment (std::optional<GVK::DebugUtilsMessenger::Ca
                 case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU: return "VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU";
                 case VK_PHYSICAL_DEVICE_TYPE_CPU: return "VK_PHYSICAL_DEVICE_TYPE_CPU";
                 default:
-                    GVK_BREAK ();
+                    RG_BREAK ();
                     return "<unknown>";
             }
         };
 
 
-        spdlog::info ("physical device api version: {}", GVK::GetVersionString (properties.apiVersion));
-        spdlog::info ("physical device driver version: {} ({})", GVK::GetVersionString (properties.driverVersion), properties.driverVersion);
+        spdlog::info ("physical device api version: {}", RG::GetVersionString (properties.apiVersion));
+        spdlog::info ("physical device driver version: {} ({})", RG::GetVersionString (properties.driverVersion), properties.driverVersion);
         spdlog::info ("device name: {}", properties.deviceName);
         spdlog::info ("device type: {}", DeviceTypeToString (properties.deviceType));
         spdlog::info ("device id: {}", properties.deviceID);
@@ -293,18 +293,18 @@ VulkanEnvironment::VulkanEnvironment (std::optional<GVK::DebugUtilsMessenger::Ca
         vkGetPhysicalDeviceFormatProperties (*physicalDevice, VK_FORMAT_R32G32B32_SFLOAT, &props);
     }
 
-    device = std::make_unique<GVK::DeviceObject> (*physicalDevice, std::vector<uint32_t> { *physicalDevice->GetQueueFamilies ().graphics }, deviceExtensions);
+    device = std::make_unique<RG::DeviceObject> (*physicalDevice, std::vector<uint32_t> { *physicalDevice->GetQueueFamilies ().graphics }, deviceExtensions);
 
-    allocator = std::make_unique<GVK::Allocator> (*instance, *physicalDevice, *device);
+    allocator = std::make_unique<RG::Allocator> (*instance, *physicalDevice, *device);
 
-    graphicsQueue = std::make_unique<GVK::Queue> (*device, *physicalDevice->GetQueueFamilies ().graphics);
+    graphicsQueue = std::make_unique<RG::Queue> (*device, *physicalDevice->GetQueueFamilies ().graphics);
 
-    commandPool = std::make_unique<GVK::CommandPool> (*device, *physicalDevice->GetQueueFamilies ().graphics);
+    commandPool = std::make_unique<RG::CommandPool> (*device, *physicalDevice->GetQueueFamilies ().graphics);
 
-    deviceExtra = std::make_unique<GVK::DeviceExtra> (*instance, *device, *commandPool, *allocator, *graphicsQueue);
+    deviceExtra = std::make_unique<RG::DeviceExtra> (*instance, *device, *commandPool, *allocator, *graphicsQueue);
 
     commandPool->SetName (*deviceExtra, "VulkanEnvironment CommandPool");
-    static_cast<GVK::DeviceObject*> (device.get ())->SetName (*deviceExtra, "VulkanEnvironment DeviceObject");
+    static_cast<RG::DeviceObject*> (device.get ())->SetName (*deviceExtra, "VulkanEnvironment DeviceObject");
 }
 
 
@@ -316,7 +316,7 @@ VulkanEnvironment::~VulkanEnvironment ()
 
 bool VulkanEnvironment::CheckForPhsyicalDeviceSupport (const Presentable& presentable)
 {
-    const GVK::Surface& surface = presentable.GetSurface ();
+    const RG::Surface& surface = presentable.GetSurface ();
     return physicalDevice->CheckSurfaceSupported (surface);
 }
 

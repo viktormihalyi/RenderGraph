@@ -11,12 +11,12 @@
 
 #include <vector>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT GraphicsPipeline : public PipelineBase {
 private:
     VkDevice                    device;
-    GVK::MovablePtr<VkPipeline> handle;
+    RG::MovablePtr<VkPipeline> handle;
 
 public:
     GraphicsPipeline (VkDevice                                              device,
@@ -45,6 +45,6 @@ public:
     virtual operator VkPipeline () const override { return handle; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

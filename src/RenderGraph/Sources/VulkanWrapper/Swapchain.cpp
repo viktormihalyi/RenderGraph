@@ -3,7 +3,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace GVK {
+namespace RG {
 
 
 const VkImageUsageFlags RealSwapchain::ImageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
@@ -19,7 +19,7 @@ VkSurfaceFormatKHR DefaultSwapchainSettings::SelectSurfaceFormat (const std::vec
         }
     }
 
-    GVK_BREAK ();
+    RG_BREAK ();
     spdlog::error ("VkSwapchainKHR: Failed to choose swapchain surface format ({} format and {} color space is not available).", preferred.format, preferred.colorSpace);
     throw std::runtime_error ("failed to choose swapchain surface format");
 }
@@ -35,7 +35,7 @@ VkPresentModeKHR DefaultSwapchainSettings::SelectPresentMode (const std::vector<
         }
     }
 
-    GVK_BREAK ();
+    RG_BREAK ();
     spdlog::error ("VkSwapchainKHR: Failed to choose swapchain present mode.");
     throw std::runtime_error ("failed to choose swapchain present mode");
 }
@@ -73,7 +73,7 @@ uint32_t DefaultSwapchainSettings::SelectImageCount (const VkSurfaceCapabilities
 
 uint32_t DefaultSwapchainSettingsSingleImage::SelectImageCount (const VkSurfaceCapabilitiesKHR& capabilities)
 {
-    if (GVK_ERROR (capabilities.minImageCount > 1)) {
+    if (RG_ERROR (capabilities.minImageCount > 1)) {
         return capabilities.minImageCount;
     }
 
@@ -93,25 +93,25 @@ RealSwapchain::CreateResult RealSwapchain::CreateForResult (const CreateSettings
 
     VkSurfaceCapabilitiesKHR capabilities = {};
     const VkResult           capRes       = vkGetPhysicalDeviceSurfaceCapabilitiesKHR (createSettings.physicalDevice, createSettings.surface, &capabilities);
-    if (GVK_ERROR (capRes != VK_SUCCESS)) {
+    if (RG_ERROR (capRes != VK_SUCCESS)) {
         throw std::runtime_error ("Failed to get physical device surface capabilitites.");
     }
 
     const std::vector<VkSurfaceFormatKHR> formats = [&] {
         std::vector<VkSurfaceFormatKHR> result;
         uint32_t                        formatCount = 0;
-        GVK_ASSERT (vkGetPhysicalDeviceSurfaceFormatsKHR (createSettings.physicalDevice, createSettings.surface, &formatCount, nullptr) == VK_SUCCESS);
+        RG_ASSERT (vkGetPhysicalDeviceSurfaceFormatsKHR (createSettings.physicalDevice, createSettings.surface, &formatCount, nullptr) == VK_SUCCESS);
         result.resize (formatCount);
-        GVK_ASSERT (vkGetPhysicalDeviceSurfaceFormatsKHR (createSettings.physicalDevice, createSettings.surface, &formatCount, result.data ()) == VK_SUCCESS);
+        RG_ASSERT (vkGetPhysicalDeviceSurfaceFormatsKHR (createSettings.physicalDevice, createSettings.surface, &formatCount, result.data ()) == VK_SUCCESS);
         return result;
     } ();
 
     const std::vector<VkPresentModeKHR> presentModes = [&] {
         std::vector<VkPresentModeKHR> result;
         uint32_t                      presentModeCount = 0;
-        GVK_ASSERT (vkGetPhysicalDeviceSurfacePresentModesKHR (createSettings.physicalDevice, createSettings.surface, &presentModeCount, nullptr) == VK_SUCCESS);
+        RG_ASSERT (vkGetPhysicalDeviceSurfacePresentModesKHR (createSettings.physicalDevice, createSettings.surface, &presentModeCount, nullptr) == VK_SUCCESS);
         result.resize (presentModeCount);
-        GVK_ASSERT (vkGetPhysicalDeviceSurfacePresentModesKHR (createSettings.physicalDevice, createSettings.surface, &presentModeCount, result.data ()) == VK_SUCCESS);
+        RG_ASSERT (vkGetPhysicalDeviceSurfacePresentModesKHR (createSettings.physicalDevice, createSettings.surface, &presentModeCount, result.data ()) == VK_SUCCESS);
         return result;
     } ();
 
@@ -138,7 +138,7 @@ RealSwapchain::CreateResult RealSwapchain::CreateForResult (const CreateSettings
     createInfo.clipped                  = VK_TRUE;
     createInfo.oldSwapchain             = VK_NULL_HANDLE;
 
-    if (GVK_ERROR (vkCreateSwapchainKHR (createSettings.device, &createInfo, nullptr, &createResult.handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateSwapchainKHR (createSettings.device, &createInfo, nullptr, &createResult.handle) != VK_SUCCESS)) {
         spdlog::critical ("VkSwapchainKHR creation failed.");
         throw std::runtime_error ("failed to create swapchain");
     }
@@ -149,9 +149,9 @@ RealSwapchain::CreateResult RealSwapchain::CreateForResult (const CreateSettings
     spdlog::info ("Created VkSwapchainKHR with imageCount: {} ", createResult.imageCount);
 
     uint32_t imageCount;
-    GVK_ASSERT (vkGetSwapchainImagesKHR (createSettings.device, createResult.handle, &imageCount, nullptr) == VK_SUCCESS);
+    RG_ASSERT (vkGetSwapchainImagesKHR (createSettings.device, createResult.handle, &imageCount, nullptr) == VK_SUCCESS);
     createResult.images.resize (imageCount);
-    GVK_ASSERT (vkGetSwapchainImagesKHR (createSettings.device, createResult.handle, &imageCount, createResult.images.data ()) == VK_SUCCESS);
+    RG_ASSERT (vkGetSwapchainImagesKHR (createSettings.device, createResult.handle, &imageCount, createResult.images.data ()) == VK_SUCCESS);
 
     for (size_t i = 0; i < createResult.images.size (); ++i) {
         createResult.imageViews.push_back (std::make_unique<ImageView2D> (createSettings.device, createResult.images[i], createResult.surfaceFormat.format));
@@ -210,7 +210,7 @@ uint32_t RealSwapchain::GetNextImageIndex (VkSemaphore signalSemaphore, VkFence 
     uint32_t result;
 
     VkResult err = vkAcquireNextImageKHR (createSettings.device, createResult.handle, UINT64_MAX, signalSemaphore, fenceToSignal, &result);
-    if (GVK_ERROR (err != VK_SUCCESS && err != VK_ERROR_OUT_OF_DATE_KHR && err != VK_SUBOPTIMAL_KHR)) {
+    if (RG_ERROR (err != VK_SUCCESS && err != VK_ERROR_OUT_OF_DATE_KHR && err != VK_SUBOPTIMAL_KHR)) {
         spdlog::error ("VkSwapchain: vkAcquireNextImageKHR failed.");
         throw std::runtime_error ("err");
     }
@@ -236,7 +236,7 @@ void RealSwapchain::Present (VkQueue queue, uint32_t imageIndex, const std::vect
     presentInfo.pResults           = nullptr;
 
     const VkResult err = vkQueuePresentKHR (queue, &presentInfo);
-    if (GVK_ERROR (err != VK_SUCCESS && err != VK_SUBOPTIMAL_KHR && err != VK_ERROR_OUT_OF_DATE_KHR)) {
+    if (RG_ERROR (err != VK_SUCCESS && err != VK_SUBOPTIMAL_KHR && err != VK_ERROR_OUT_OF_DATE_KHR)) {
         spdlog::error ("VkSwapchain: Presentation failed.");
         throw std::runtime_error ("failed to present");
     }
@@ -260,4 +260,4 @@ FakeSwapchain::FakeSwapchain (const DeviceExtra& device, uint32_t width, uint32_
     TransitionImageLayout (device, *image, Image2D::INITIAL_LAYOUT, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
 
-} // namespace GVK
+} // namespace RG

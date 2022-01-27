@@ -7,12 +7,12 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT Surface : public VulkanObject {
 private:
     VkInstance                    instance;
-    GVK::MovablePtr<VkSurfaceKHR> handle;
+    RG::MovablePtr<VkSurfaceKHR> handle;
 
 public:
     Surface (VkInstance instance, VkSurfaceKHR&& handle);
@@ -35,6 +35,6 @@ public:
     operator VkSurfaceKHR () const { return handle; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

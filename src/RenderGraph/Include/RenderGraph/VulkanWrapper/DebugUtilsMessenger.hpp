@@ -10,7 +10,7 @@
 
 #include <functional>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT DebugUtilsMessenger : public VulkanObject {
 public:
@@ -31,7 +31,7 @@ public:
 
 private:
     VkInstance                                instance;
-    GVK::MovablePtr<VkDebugUtilsMessengerEXT> handle;
+    RG::MovablePtr<VkDebugUtilsMessengerEXT> handle;
     Callback                                  callback;
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback (
@@ -59,6 +59,6 @@ public:
     operator VkDebugUtilsMessengerEXT () const { return handle; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

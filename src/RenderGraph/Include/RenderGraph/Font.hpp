@@ -110,7 +110,7 @@ private:
     std::unordered_map<uint32_t, std::unique_ptr<GlyphData>> loadedGlyphs;
 
 public:
-    GVK::Event<uint32_t> glyphLoaded;
+    RG::Event<uint32_t> glyphLoaded;
 
 private:
     const GlyphData& Retrieve (const uint32_t unicode)
@@ -127,12 +127,12 @@ private:
             } else if (distanceFieldType == Type::MTDF) {
                 data = font.GetGlyphMTDF (width, height, unicode);
             } else {
-                GVK_BREAK ();
+                RG_BREAK ();
             }
 
             const auto insertResult = loadedGlyphs.insert ({ unicode, std::make_unique<GlyphData> (data) });
 
-            GVK_ASSERT (insertResult.second);
+            RG_ASSERT (insertResult.second);
 
             glyphLoaded (unicode);
 

@@ -8,7 +8,7 @@
 #include <functional>
 #include <optional>
 
-namespace Utils {
+namespace RG {
 
 
 class RENDERGRAPH_DLL_EXPORT Matcher {
@@ -52,8 +52,8 @@ public:
     virtual std::string RENDERGRAPH_DLL_EXPORT GetHelpText () override;
 
 protected:
-    virtual void Match (int argc, char** argv, Utils::Matcher& matcher) override;
-    virtual void MatchParameters (int, char**, Utils::Matcher&, size_t) {}
+    virtual void Match (int argc, char** argv, RG::Matcher& matcher) override;
+    virtual void MatchParameters (int, char**, RG::Matcher&, size_t) {}
 };
 
 
@@ -68,7 +68,7 @@ public:
     RENDERGRAPH_DLL_EXPORT CommandLineOnOffCallbackFlag (const std::vector<std::string>& flags, const std::string& helpText, const std::function<void ()>& onCallback);
 
 private:
-    virtual void Match (int argc, char** argv, Utils::Matcher& matcher) override;
+    virtual void Match (int argc, char** argv, RG::Matcher& matcher) override;
 };
 
 
@@ -107,12 +107,12 @@ public:
     int64_t GetValue () { return number; }
 
 private:
-    // virtual void MatchParameters (int argc, char** argv, Utils::Matcher& matcher, size_t matched) override;
+    // virtual void MatchParameters (int argc, char** argv, RG::Matcher& matcher, size_t matched) override;
 
-    virtual void MatchParameters (int argc, char** argv, Utils::Matcher& matcher, size_t matched) override
+    virtual void MatchParameters (int argc, char** argv, RG::Matcher& matcher, size_t matched) override
     {
 
-        if (GVK_VERIFY (matched + 1 < argc)) {
+        if (RG_VERIFY (matched + 1 < argc)) {
             for (int i = 0; i < std::tuple_size<decltype (values)> {}; ++i) {
                 std::get<i> (values) = from_string (argv[matched+i]);
             }
@@ -124,7 +124,7 @@ private:
 */
 
 
-} // namespace Utils
+} // namespace RG
 
 
 #endif

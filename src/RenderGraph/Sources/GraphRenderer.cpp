@@ -43,15 +43,15 @@ Window::DrawCallback Renderer::GetConditionalDrawCallback (std::function<RenderG
 }
 
 
-RecreatableGraphRenderer::RecreatableGraphRenderer (GVK::Swapchain& swapchain)
+RecreatableGraphRenderer::RecreatableGraphRenderer (RG::Swapchain& swapchain)
     : swapchain (swapchain)
 {
 }
 
 
-BlockingGraphRenderer::BlockingGraphRenderer (const GVK::DeviceExtra& device, GVK::Swapchain& swapchain)
+BlockingGraphRenderer::BlockingGraphRenderer (const RG::DeviceExtra& device, RG::Swapchain& swapchain)
     : RecreatableGraphRenderer (swapchain)
-    , s (std::make_unique<GVK::Semaphore> (device))
+    , s (std::make_unique<RG::Semaphore> (device))
 {
 }
 
@@ -61,7 +61,7 @@ uint32_t BlockingGraphRenderer::RenderNextRecreatableFrame (RenderGraph& graph, 
     const uint32_t currentImageIndex = swapchain.GetNextImageIndex (*s);
 
     {
-        const GVK::TimePoint currentTime = GVK::TimePoint::SinceApplicationStart ();
+        const RG::TimePoint currentTime = RG::TimePoint::SinceApplicationStart ();
         preSubmitEvent.Notify (graph, currentImageIndex, currentTime - lastDrawTime);
         lastDrawTime = currentTime;
     }
@@ -80,22 +80,22 @@ uint32_t BlockingGraphRenderer::RenderNextRecreatableFrame (RenderGraph& graph, 
 }
 
 
-SynchronizedSwapchainGraphRenderer::SynchronizedSwapchainGraphRenderer (const GVK::DeviceExtra& device, GVK::Swapchain& swapchain)
+SynchronizedSwapchainGraphRenderer::SynchronizedSwapchainGraphRenderer (const RG::DeviceExtra& device, RG::Swapchain& swapchain)
     : RecreatableGraphRenderer { swapchain }
     , framesInFlight { swapchain.GetImageCount () }
     , imageCount { swapchain.GetImageCount () }
     , currentResourceIndex { 0 }
     , swapchain { swapchain }
-    , presentationEngineFence { std::make_unique<GVK::Fence> (device, false) }
+    , presentationEngineFence { std::make_unique<RG::Fence> (device, false) }
 {
     presentationEngineFence->SetName (device, "presentationEngineFence");
     
-    GVK_ASSERT (imageCount <= framesInFlight);
+    RG_ASSERT (imageCount <= framesInFlight);
 
     for (uint32_t i = 0; i < framesInFlight; ++i) {
-        imageAvailableSemaphore.push_back (std::make_unique<GVK::Semaphore> (device));
-        renderFinishedSemaphore.push_back (std::make_unique<GVK::Semaphore> (device));
-        inFlightFences.push_back (std::make_unique<GVK::Fence> (device));
+        imageAvailableSemaphore.push_back (std::make_unique<RG::Semaphore> (device));
+        renderFinishedSemaphore.push_back (std::make_unique<RG::Semaphore> (device));
+        inFlightFences.push_back (std::make_unique<RG::Fence> (device));
         inFlightFences.back ()->SetName (device, std::string ("inFlightFence ") + std::to_string (i));
     }
 
@@ -124,7 +124,7 @@ uint32_t RecreatableGraphRenderer::RenderNextFrame (RenderGraph& graph, IFrameDi
 {
     try {
         return RenderNextRecreatableFrame (graph, observer);
-    } catch (GVK::OutOfDateSwapchain&) {
+    } catch (RG::OutOfDateSwapchain&) {
         throw;
     }
 }
@@ -161,7 +161,7 @@ uint32_t SynchronizedSwapchainGraphRenderer::RenderNextRecreatableFrame (RenderG
     inFlightFences[currentResourceIndex]->Reset ();
 
     {
-        const GVK::TimePoint currentTime = GVK::TimePoint::SinceApplicationStart ();
+        const RG::TimePoint currentTime = RG::TimePoint::SinceApplicationStart ();
         preSubmitEvent.Notify (graph, currentResourceIndex, currentTime - lastDrawTime);
         lastDrawTime = currentTime;
     }
@@ -169,7 +169,7 @@ uint32_t SynchronizedSwapchainGraphRenderer::RenderNextRecreatableFrame (RenderG
     frameDisplayObserver.OnRenderStarted (currentResourceIndex);
     graph.Submit (currentResourceIndex, submitWaitSemaphores, submitSignalSemaphores, *inFlightFences[currentResourceIndex]);
 
-    GVK_ASSERT (swapchain.SupportsPresenting ());
+    RG_ASSERT (swapchain.SupportsPresenting ());
 
     frameDisplayObserver.OnPresentStarted (currentResourceIndex);
     graph.Present (currentImageIndex, swapchain, presentWaitSemaphores);

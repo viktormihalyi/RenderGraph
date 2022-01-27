@@ -6,7 +6,7 @@
 #include <chrono>
 #include <string>
 
-namespace Utils {
+namespace RG {
 
 class TimerObserver {
 public:
@@ -43,6 +43,6 @@ private:
 };
 
 
-} // namespace Utils
+} // namespace RG
 
 #endif

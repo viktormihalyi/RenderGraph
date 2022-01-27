@@ -1,6 +1,6 @@
 #include "Commands.hpp"
 
-namespace GVK {
+namespace RG {
 
 const VkAccessFlags CommandPipelineBarrierFull::flushAll = VK_ACCESS_INDIRECT_COMMAND_READ_BIT |
                                                            VK_ACCESS_INDEX_READ_BIT |
@@ -41,4 +41,4 @@ void CommandPipelineBarrier::Record (CommandBuffer& commandBuffer)
         static_cast<uint32_t> (imageMemoryBarriers.size ()), imageMemoryBarriers.data ());
 }
 
-} // namespace GVK
+} // namespace RG

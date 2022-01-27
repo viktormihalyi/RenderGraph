@@ -10,12 +10,12 @@
 
 #include <stdexcept>
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ CommandPool : public VulkanObject, public Nonmovable {
 private:
     VkDevice                       device;
-    GVK::MovablePtr<VkCommandPool> handle;
+    RG::MovablePtr<VkCommandPool> handle;
 
 public:
     CommandPool (VkDevice device, uint32_t queueIndex)
@@ -26,7 +26,7 @@ public:
         commandPoolInfo.sType                   = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         commandPoolInfo.queueFamilyIndex        = queueIndex;
         commandPoolInfo.flags                   = 0;
-        if (GVK_ERROR (vkCreateCommandPool (device, &commandPoolInfo, nullptr, &handle) != VK_SUCCESS)) {
+        if (RG_ERROR (vkCreateCommandPool (device, &commandPoolInfo, nullptr, &handle) != VK_SUCCESS)) {
             throw std::runtime_error ("failed to create commandpool");
         }
     }
@@ -47,6 +47,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -14,7 +14,7 @@
 #include <unordered_set>
 
 
-namespace GVK {
+namespace RG {
 class CommandBuffer;
 class Swapchain;
 }
@@ -32,7 +32,7 @@ class RENDERGRAPH_DLL_EXPORT RenderGraph final : public Noncopyable {
 public:// TODO
     bool                       compiled;
     std::vector<Pass>          passes;
-    std::vector<GVK::CommandBuffer> commandBuffers;
+    std::vector<RG::CommandBuffer> commandBuffers;
     
     std::unordered_map<VkImage, std::vector<VkImageLayout>> imageLayoutSequence;
 
@@ -45,7 +45,7 @@ public:
     void Compile (GraphSettings&& settings);
 
     void Submit (uint32_t frameIndex, const std::vector<VkSemaphore>& waitSemaphores = {}, const std::vector<VkSemaphore>& signalSemaphores = {}, VkFence fence = VK_NULL_HANDLE);
-    void Present (uint32_t imageIndex, GVK::Swapchain& swapchain, const std::vector<VkSemaphore>& waitSemaphores = {});
+    void Present (uint32_t imageIndex, RG::Swapchain& swapchain, const std::vector<VkSemaphore>& waitSemaphores = {});
 
     uint32_t GetPassCount () const;
 

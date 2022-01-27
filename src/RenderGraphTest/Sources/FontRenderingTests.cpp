@@ -169,7 +169,7 @@ TEST_F (FontRenderingTests, DISABLED_SDF_a)
 
     dataV.resize (selected.w * selected.h);
     memcpy (dataV.data (), selected.data, dataV.size ());
-    GVK::ImageData asd = GVK::ImageData::FromDataUint (dataV, selected.w, selected.h, 1);
+    RG::ImageData asd = RG::ImageData::FromDataUint (dataV, selected.w, selected.h, 1);
     asd.SaveTo (std::filesystem::current_path () / "test.png");
 
     ypos = 60;
@@ -185,7 +185,7 @@ TEST_F (FontRenderingTests, DISABLED_SDF_a)
 }
 
 
-void CompareImages2 (const std::string &name, const GVK::ImageData &referenceImage, const GVK::ImageData &actualImage)
+void CompareImages2 (const std::string &name, const RG::ImageData &referenceImage, const RG::ImageData &actualImage)
 {
     const bool isSame = referenceImage == actualImage;
 

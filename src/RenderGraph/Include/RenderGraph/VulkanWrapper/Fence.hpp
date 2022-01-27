@@ -6,13 +6,13 @@
 #include "RenderGraph/Utils/MovablePtr.hpp"
 #include "VulkanObject.hpp"
 
-namespace GVK {
+namespace RG {
 
 
 class RENDERGRAPH_DLL_EXPORT Fence : public VulkanObject {
 private:
     VkDevice                 device;
-    GVK::MovablePtr<VkFence> handle;
+    RG::MovablePtr<VkFence> handle;
 
 public:
     Fence (VkDevice device, bool signaled = true);
@@ -35,6 +35,6 @@ private:
     void WaitImpl () const;
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

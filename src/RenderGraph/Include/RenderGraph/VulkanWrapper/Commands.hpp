@@ -9,7 +9,7 @@
 #include <functional>
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT CommandBindVertexBuffers : public Command {
 private:
@@ -563,7 +563,7 @@ public:
         , dstImageLayout (dstImageLayout)
         , regions (regions)
     {
-        GVK_ASSERT (dstImageLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL || dstImageLayout == VK_IMAGE_LAYOUT_GENERAL);
+        RG_ASSERT (dstImageLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL || dstImageLayout == VK_IMAGE_LAYOUT_GENERAL);
     }
 
     virtual void Record (CommandBuffer& commandBuffer) override
@@ -725,6 +725,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

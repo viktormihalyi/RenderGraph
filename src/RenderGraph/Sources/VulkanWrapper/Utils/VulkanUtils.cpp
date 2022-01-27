@@ -12,7 +12,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace GVK {
+namespace RG {
 
 std::string GetVersionString (uint32_t version)
 {
@@ -120,7 +120,7 @@ uint32_t GetCompontentCountFromFormat (VkFormat format)
         case VK_FORMAT_R8G8B8A8_UINT:
             return 4;
         default:
-            GVK_BREAK ();
+            RG_BREAK ();
             return 4;
     }
 }
@@ -155,9 +155,9 @@ uint32_t GetEachCompontentSizeFromFormat (VkFormat format)
             return 4;
 
         default:
-            GVK_BREAK ();
+            RG_BREAK ();
             return 1;
     }
 }
 
-} // namespace GVK
+} // namespace RG

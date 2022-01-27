@@ -11,7 +11,7 @@
 
 #include <cstring>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT BufferTransferable final {
 public:
@@ -160,7 +160,7 @@ public:
     void operator= (const std::vector<VertexType>& copiedData)
     {
         const size_t copiedBytes = copiedData.size () * sizeof (VertexType);
-        GVK_ASSERT (copiedBytes <= data.size ());
+        RG_ASSERT (copiedBytes <= data.size ());
         memcpy (data.data (), copiedData.data (), copiedBytes);
     }
 };
@@ -185,7 +185,7 @@ public:
 
     void operator= (const std::vector<IndexType>& copiedData)
     {
-        GVK_ASSERT (copiedData.size () == data.size ());
+        RG_ASSERT (copiedData.size () == data.size ());
         memcpy (data.data (), copiedData.data (), copiedData.size () * sizeof (IndexType));
     }
 
@@ -200,6 +200,6 @@ using IndexBufferTransferableU   = std::unique_ptr<IndexBufferTransferableBase<u
 using IndexBufferTransferable32  = IndexBufferTransferableBase<uint32_t, VK_INDEX_TYPE_UINT32>;
 using IndexBufferTransferable32U = std::unique_ptr<IndexBufferTransferableBase<uint32_t, VK_INDEX_TYPE_UINT32>>;
 
-} // namespace GVK
+} // namespace RG
 
 #endif

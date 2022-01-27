@@ -9,13 +9,13 @@
 #include "DescriptorPool.hpp"
 #include "DescriptorSetLayout.hpp"
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ DescriptorSet : public VulkanObject {
 private:
     VkDevice                         device;
     VkDescriptorPool                 descriptorPool;
-    GVK::MovablePtr<VkDescriptorSet> handle;
+    RG::MovablePtr<VkDescriptorSet> handle;
 
 public:
     DescriptorSet (VkDevice device, VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout)
@@ -29,7 +29,7 @@ public:
         allocInfo.descriptorSetCount          = 1;
         allocInfo.pSetLayouts                 = &layout;
 
-        if (GVK_ERROR (vkAllocateDescriptorSets (device, &allocInfo, &handle) != VK_SUCCESS)) {
+        if (RG_ERROR (vkAllocateDescriptorSets (device, &allocInfo, &handle) != VK_SUCCESS)) {
             throw std::runtime_error ("failed to allocate descriptor sets!");
         }
     }
@@ -61,6 +61,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

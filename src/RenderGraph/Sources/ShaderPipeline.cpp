@@ -32,7 +32,7 @@ void ShaderPipeline::CompileResult::Clear ()
 }
 
 
-std::unique_ptr<GVK::ShaderModule>& ShaderPipeline::GetShaderByIndex (uint32_t index)
+std::unique_ptr<RG::ShaderModule>& ShaderPipeline::GetShaderByIndex (uint32_t index)
 {
     switch (index) {
         case 0: return vertexShader;
@@ -42,13 +42,13 @@ std::unique_ptr<GVK::ShaderModule>& ShaderPipeline::GetShaderByIndex (uint32_t i
         case 4: return tessellationControlShader;
         case 5: return computeShader;
         default:
-            GVK_BREAK ();
+            RG_BREAK ();
             throw std::runtime_error ("no");
     }
 }
 
 
-std::unique_ptr<GVK::ShaderModule>& ShaderPipeline::GetShaderByExtension (const std::string& extension)
+std::unique_ptr<RG::ShaderModule>& ShaderPipeline::GetShaderByExtension (const std::string& extension)
 {
     if (extension == ".vert") {
         return vertexShader;
@@ -64,29 +64,29 @@ std::unique_ptr<GVK::ShaderModule>& ShaderPipeline::GetShaderByExtension (const 
         return computeShader;
     }
 
-    GVK_BREAK ();
+    RG_BREAK ();
     throw std::runtime_error ("bad shader extension");
 }
 
 
-const GVK::ShaderModuleReflection& ShaderPipeline::GetReflection (GVK::ShaderKind kind)
+const RG::ShaderModuleReflection& ShaderPipeline::GetReflection (RG::ShaderKind kind)
 {
     return GetShaderByKind (kind)->GetReflection ();
 }
 
 
-std::unique_ptr<GVK::ShaderModule>& ShaderPipeline::GetShaderByKind (GVK::ShaderKind kind)
+std::unique_ptr<RG::ShaderModule>& ShaderPipeline::GetShaderByKind (RG::ShaderKind kind)
 {
     switch (kind) {
-        case GVK::ShaderKind::Vertex: return vertexShader;
-        case GVK::ShaderKind::Fragment: return fragmentShader;
-        case GVK::ShaderKind::TessellationControl: return tessellationControlShader;
-        case GVK::ShaderKind::TessellationEvaluation: return tessellationEvaluationShader;
-        case GVK::ShaderKind::Geometry: return geometryShader;
-        case GVK::ShaderKind::Compute: return computeShader;
+        case RG::ShaderKind::Vertex: return vertexShader;
+        case RG::ShaderKind::Fragment: return fragmentShader;
+        case RG::ShaderKind::TessellationControl: return tessellationControlShader;
+        case RG::ShaderKind::TessellationEvaluation: return tessellationEvaluationShader;
+        case RG::ShaderKind::Geometry: return geometryShader;
+        case RG::ShaderKind::Compute: return computeShader;
     }
 
-    GVK_BREAK ();
+    RG_BREAK ();
     throw std::runtime_error ("unknown shader kind");
 }
 
@@ -104,11 +104,11 @@ ShaderPipeline::ShaderPipeline (VkDevice device, const std::vector<std::filesyst
 }
 
 
-ShaderPipeline::ShaderPipeline (VkDevice device, const std::vector<std::pair<GVK::ShaderKind, std::string>>& sources)
+ShaderPipeline::ShaderPipeline (VkDevice device, const std::vector<std::pair<RG::ShaderKind, std::string>>& sources)
     : ShaderPipeline (device)
 {
     for (auto [kind, source] : sources) {
-        GetShaderByKind (kind) = GVK::ShaderModule::CreateFromGLSLString (device, kind, source);
+        GetShaderByKind (kind) = RG::ShaderModule::CreateFromGLSLString (device, kind, source);
     }
 }
 
@@ -134,31 +134,31 @@ std::vector<VkPipelineShaderStageCreateInfo> ShaderPipeline::GetShaderStages () 
 }
 
 
-void ShaderPipeline::SetShaderFromSourceString (GVK::ShaderKind shaderKind, const std::string& source)
+void ShaderPipeline::SetShaderFromSourceString (RG::ShaderKind shaderKind, const std::string& source)
 {
-    GVK_ASSERT (GetShaderByKind (shaderKind) == nullptr);
-    GetShaderByKind (shaderKind) = GVK::ShaderModule::CreateFromGLSLString (device, shaderKind, source);
+    RG_ASSERT (GetShaderByKind (shaderKind) == nullptr);
+    GetShaderByKind (shaderKind) = RG::ShaderModule::CreateFromGLSLString (device, shaderKind, source);
 }
 
 
 void ShaderPipeline::SetVertexShaderFromString (const std::string& source)
 {
-    SetShaderFromSourceString (GVK::ShaderKind::Vertex, source);
+    SetShaderFromSourceString (RG::ShaderKind::Vertex, source);
 }
 
 
 void ShaderPipeline::SetFragmentShaderFromString (const std::string& source)
 {
-    SetShaderFromSourceString (GVK::ShaderKind::Fragment, source);
+    SetShaderFromSourceString (RG::ShaderKind::Fragment, source);
 }
 
 
 void ShaderPipeline::SetShaderFromSourceFile (const std::filesystem::path& shaderPath)
 {
     // assert on overwriting shader
-    GVK_ASSERT (GetShaderByExtension (shaderPath.extension ().string ()) == nullptr);
+    RG_ASSERT (GetShaderByExtension (shaderPath.extension ().string ()) == nullptr);
 
-    GetShaderByExtension (shaderPath.extension ().string ()) = GVK::ShaderModule::CreateFromGLSLFile (device, shaderPath);
+    GetShaderByExtension (shaderPath.extension ().string ()) = RG::ShaderModule::CreateFromGLSLFile (device, shaderPath);
 }
 
 
@@ -209,13 +209,13 @@ void ShaderPipeline::Compile (CompileSettings&& settings_)
     dependency.srcSubpass           = 0;
     dependency.dstSubpass           = VK_SUBPASS_EXTERNAL;
 
-    compileResult.renderPass     = std::unique_ptr<GVK::RenderPass> (new GVK::RenderPass (device, compileSettings.attachmentDescriptions, { subpass }, { dependency, dependency2 }));
-    compileResult.pipelineLayout = std::unique_ptr<GVK::PipelineLayout> (new GVK::PipelineLayout (device, { compileSettings.layout }));
+    compileResult.renderPass     = std::unique_ptr<RG::RenderPass> (new RG::RenderPass (device, compileSettings.attachmentDescriptions, { subpass }, { dependency, dependency2 }));
+    compileResult.pipelineLayout = std::unique_ptr<RG::PipelineLayout> (new RG::PipelineLayout (device, { compileSettings.layout }));
 
     const std::vector<VkVertexInputAttributeDescription> attribs  = RG::FromShaderReflection::GetVertexAttributes (vertexShader->GetReflection (), instancedVertexProvider);
     const std::vector<VkVertexInputBindingDescription>   bindings = RG::FromShaderReflection::GetVertexBindings (vertexShader->GetReflection (), instancedVertexProvider);
 
-    compileResult.pipeline = std::unique_ptr<GVK::GraphicsPipeline> (new GVK::GraphicsPipeline (
+    compileResult.pipeline = std::unique_ptr<RG::GraphicsPipeline> (new RG::GraphicsPipeline (
         device,
         compileSettings.width,
         compileSettings.height,
@@ -233,7 +233,7 @@ void ShaderPipeline::Compile (CompileSettings&& settings_)
 void ShaderPipeline::Reload ()
 {
     MultithreadedFunction reloader (5, [&] (uint32_t, uint32_t threadIndex) {
-        std::unique_ptr<GVK::ShaderModule>& currentShader = GetShaderByIndex (threadIndex);
+        std::unique_ptr<RG::ShaderModule>& currentShader = GetShaderByIndex (threadIndex);
 
         if (currentShader != nullptr) {
             currentShader->Reload ();
@@ -242,7 +242,7 @@ void ShaderPipeline::Reload ()
 }
 
 
-void ShaderPipeline::IterateShaders (const std::function<void (GVK::ShaderModule&)>& func) const
+void ShaderPipeline::IterateShaders (const std::function<void (RG::ShaderModule&)>& func) const
 {
     if (vertexShader) {
         func (*vertexShader);
@@ -265,23 +265,23 @@ void ShaderPipeline::IterateShaders (const std::function<void (GVK::ShaderModule
 }
 
 
-std::unique_ptr<GVK::DescriptorSetLayout> ShaderPipeline::CreateDescriptorSetLayout (VkDevice device_) const
+std::unique_ptr<RG::DescriptorSetLayout> ShaderPipeline::CreateDescriptorSetLayout (VkDevice device_) const
 {
     std::vector<VkDescriptorSetLayoutBinding> layout;
 
     if constexpr (IsDebugBuild) {
         std::vector<std::string> shaderSources;
-        IterateShaders ([&] (GVK::ShaderModule& shaderModule) {
+        IterateShaders ([&] (RG::ShaderModule& shaderModule) {
             shaderSources.push_back (shaderModule.GetSourceCode ());
         });
     }
 
-    IterateShaders ([&] (GVK::ShaderModule& shaderModule) {
+    IterateShaders ([&] (RG::ShaderModule& shaderModule) {
         const std::vector<VkDescriptorSetLayoutBinding> layoutPart = RG::FromShaderReflection::GetLayout (shaderModule.GetReflection (), shaderModule.GetShaderKind ());
         layout.insert (layout.end (), layoutPart.begin (), layoutPart.end ());
     });
 
-    return std::make_unique<GVK::DescriptorSetLayout> (device_, layout);
+    return std::make_unique<RG::DescriptorSetLayout> (device_, layout);
 }
 
 } // namespace RG

@@ -33,8 +33,8 @@ UniformReflection::UniformReflection (RG::ConnectionSet& connectionSet, const Re
 
 void UniformReflection::Flush (uint32_t frameIndex)
 {
-    Utils::ForEach<RG::CPUBufferResource> (bufferObjectResources, [&] (const std::shared_ptr<RG::CPUBufferResource>& bufferObjectRes) {
-        const std::shared_ptr<SR::IBufferData> bufferObjectData = udatas.at (bufferObjectRes->GetUUID ());
+    RG::ForEach<RG::CPUBufferResource> (bufferObjectResources, [&] (const std::shared_ptr<RG::CPUBufferResource>& bufferObjectRes) {
+        const std::shared_ptr<RG::Refl::IBufferData> bufferObjectData = udatas.at (bufferObjectRes->GetUUID ());
 
         bufferObjectRes->GetMapping (frameIndex).Copy (bufferObjectData->GetData (), bufferObjectData->GetSize ());
     });
@@ -43,9 +43,9 @@ void UniformReflection::Flush (uint32_t frameIndex)
 
 void UniformReflection::CreateGraphResources (const RG::ConnectionSet& connectionSet, const ResourceCreator& resourceCreator)
 {
-    // GVK_ASSERT (!graph.operations.empty ());
+    // RG_ASSERT (!graph.operations.empty ());
 
-    const auto CreateBufferObjectResource = [&] (const std::shared_ptr<RG::Operation>& op, const GVK::ShaderModule& shaderModule, const std::shared_ptr<SR::BufferObject>& bufferObject, BufferObjectSelector& bufferObjectsel) {
+    const auto CreateBufferObjectResource = [&] (const std::shared_ptr<RG::Operation>& op, const RG::ShaderModule& shaderModule, const std::shared_ptr<RG::Refl::BufferObject>& bufferObject, BufferObjectSelector& bufferObjectsel) {
 
         bool treatAsOutput = false;
 
@@ -62,7 +62,7 @@ void UniformReflection::CreateGraphResources (const RG::ConnectionSet& connectio
         bufferObjectRes->SetName (bufferObject->name);
         bufferObjectRes->SetDebugInfo ("Made by UniformReflection.");
 
-        std::shared_ptr<SR::BufferDataInternal> bufferObjectData = std::make_unique<SR::BufferDataInternal> (bufferObject);
+        std::shared_ptr<RG::Refl::BufferDataInternal> bufferObjectData = std::make_unique<RG::Refl::BufferDataInternal> (bufferObject);
         bufferObjectsel.Set (bufferObject->name, bufferObjectData);
 
         bufferObjectConnections.push_back (std::make_tuple (op, bufferObject, bufferObjectRes, shaderModule.GetShaderKind (), treatAsOutput));
@@ -70,28 +70,28 @@ void UniformReflection::CreateGraphResources (const RG::ConnectionSet& connectio
         udatas.insert ({ bufferObjectRes->GetUUID (), bufferObjectData });
     };
 
-    const auto CreateBufferObjectsFromShader = [&] (const std::shared_ptr<Operation>& op, const GVK::ShaderModule& shaderModule, ShaderKindSelector& newShaderKindSelector) {
+    const auto CreateBufferObjectsFromShader = [&] (const std::shared_ptr<Operation>& op, const RG::ShaderModule& shaderModule, ShaderKindSelector& newShaderKindSelector) {
         BufferObjectSelector newBufferObjectSelector;
-        for (const std::shared_ptr<SR::BufferObject>& ubo : shaderModule.GetReflection ().ubos) {
+        for (const std::shared_ptr<RG::Refl::BufferObject>& ubo : shaderModule.GetReflection ().ubos) {
             CreateBufferObjectResource (op, shaderModule, ubo, newBufferObjectSelector);
         }
-        for (const std::shared_ptr<SR::BufferObject>& storageBuffer : shaderModule.GetReflection ().storageBuffers) {
+        for (const std::shared_ptr<RG::Refl::BufferObject>& storageBuffer : shaderModule.GetReflection ().storageBuffers) {
             CreateBufferObjectResource (op, shaderModule, storageBuffer, newBufferObjectSelector);
         }
         newShaderKindSelector.Set (shaderModule.GetShaderKind (), std::move (newBufferObjectSelector));
     };
 
-    Utils::ForEach<RG::RenderOperation> (connectionSet.GetNodesByInsertionOrder (), [&] (const std::shared_ptr<RG::RenderOperation>& renderOp) {
+    RG::ForEach<RG::RenderOperation> (connectionSet.GetNodesByInsertionOrder (), [&] (const std::shared_ptr<RG::RenderOperation>& renderOp) {
         ShaderKindSelector newShaderKindSelector;
-        renderOp->GetShaderPipeline ()->IterateShaders ([&] (const GVK::ShaderModule& shaderModule) {
+        renderOp->GetShaderPipeline ()->IterateShaders ([&] (const RG::ShaderModule& shaderModule) {
             CreateBufferObjectsFromShader (renderOp, shaderModule, newShaderKindSelector);
         });
         selectors.emplace (renderOp->GetUUID (), std::move (newShaderKindSelector));
     });
 
-    Utils::ForEach<RG::ComputeOperation> (connectionSet.GetNodesByInsertionOrder (), [&] (const std::shared_ptr<RG::ComputeOperation>& computeOp) {
+    RG::ForEach<RG::ComputeOperation> (connectionSet.GetNodesByInsertionOrder (), [&] (const std::shared_ptr<RG::ComputeOperation>& computeOp) {
         ShaderKindSelector newShaderKindSelector;
-        computeOp->compileSettings.computeShaderPipeline->IterateShaders ([&] (const GVK::ShaderModule& shaderModule) {
+        computeOp->compileSettings.computeShaderPipeline->IterateShaders ([&] (const RG::ShaderModule& shaderModule) {
             CreateBufferObjectsFromShader (computeOp, shaderModule, newShaderKindSelector);
         });
         selectors.emplace (computeOp->GetUUID (), std::move (newShaderKindSelector));
@@ -101,7 +101,7 @@ void UniformReflection::CreateGraphResources (const RG::ConnectionSet& connectio
 
 void UniformReflection::CreateGraphConnections (RG::ConnectionSet& connectionSet)
 {
-    GVK_ASSERT (!bufferObjectConnections.empty ());
+    RG_ASSERT (!bufferObjectConnections.empty ());
 
     for (auto& [operation, bufferObject, resource, shaderKind, treatAsOutput] : bufferObjectConnections) {
 
@@ -118,7 +118,7 @@ void UniformReflection::CreateGraphConnections (RG::ConnectionSet& connectionSet
             auto& table = computeOp->compileSettings.descriptorWriteProvider;
             table->bufferInfos.push_back ({ bufferObject->name, shaderKind, resource->GetBufferForFrameProvider (), 0, resource->GetBufferSize () });
         } else {
-            GVK_BREAK ();
+            RG_BREAK ();
         }
     }
 
@@ -159,7 +159,7 @@ std::shared_ptr<ReadOnlyImageResource> ImageMap::FindByName (const std::string& 
 }
 
 
-void ImageMap::Put (const SR::Sampler& sampler, const std::shared_ptr<ReadOnlyImageResource>& res)
+void ImageMap::Put (const RG::Refl::Sampler& sampler, const std::shared_ptr<ReadOnlyImageResource>& res)
 {
     images.emplace_back (sampler, res);
 }
@@ -167,7 +167,7 @@ void ImageMap::Put (const SR::Sampler& sampler, const std::shared_ptr<ReadOnlyIm
 
 ImageMap CreateEmptyImageResources (RG::ConnectionSet& connectionSet)
 {
-    return CreateEmptyImageResources (connectionSet, [&] (const SR::Sampler&) { return std::nullopt; });
+    return CreateEmptyImageResources (connectionSet, [&] (const RG::Refl::Sampler&) { return std::nullopt; });
 }
 
 
@@ -176,9 +176,9 @@ ImageMap CreateEmptyImageResources (RG::ConnectionSet& connectionSet, const Exte
     ImageMap result;
 
     const auto nodes = connectionSet.GetNodesByInsertionOrder ();
-    Utils::ForEach<RG::RenderOperation> (nodes, [&] (const std::shared_ptr<RG::RenderOperation>& renderOp) {
-        renderOp->GetShaderPipeline ()->IterateShaders ([&] (const GVK::ShaderModule& shaderModule) {
-            for (const SR::Sampler& sampler : shaderModule.GetReflection ().samplers) {
+    RG::ForEach<RG::RenderOperation> (nodes, [&] (const std::shared_ptr<RG::RenderOperation>& renderOp) {
+        renderOp->GetShaderPipeline ()->IterateShaders ([&] (const RG::ShaderModule& shaderModule) {
+            for (const RG::Refl::Sampler& sampler : shaderModule.GetReflection ().samplers) {
                 std::shared_ptr<ReadOnlyImageResource> imgRes;
 
                 const std::optional<CreateParams> providedExtent = extentProvider (sampler);
@@ -193,24 +193,24 @@ ImageMap CreateEmptyImageResources (RG::ConnectionSet& connectionSet, const Exte
                 const uint32_t layerCount = sampler.arraySize;
 
                 switch (sampler.type) {
-                    case SR::Sampler::Type::Sampler1D:
-                        GVK_ASSERT (!providedExtent.has_value () || (extent.x != 0 && extent.y == 0 && extent.z == 0));
+                    case RG::Refl::Sampler::Type::Sampler1D:
+                        RG_ASSERT (!providedExtent.has_value () || (extent.x != 0 && extent.y == 0 && extent.z == 0));
                         imgRes = std::make_unique<ReadOnlyImageResource> (format, filter, extent.x, 1, 1, layerCount);
                         break;
-                    case SR::Sampler::Type::Sampler2D:
-                        GVK_ASSERT (!providedExtent.has_value () || (extent.x != 0 && extent.y != 0 && extent.z == 0));
+                    case RG::Refl::Sampler::Type::Sampler2D:
+                        RG_ASSERT (!providedExtent.has_value () || (extent.x != 0 && extent.y != 0 && extent.z == 0));
                         imgRes = std::make_unique<ReadOnlyImageResource> (format, filter, extent.x, extent.y, 1, layerCount);
                         break;
-                    case SR::Sampler::Type::Sampler3D:
-                        GVK_ASSERT (!providedExtent.has_value () || (extent.x != 0 && extent.y != 0 && extent.z != 0));
+                    case RG::Refl::Sampler::Type::Sampler3D:
+                        RG_ASSERT (!providedExtent.has_value () || (extent.x != 0 && extent.y != 0 && extent.z != 0));
                         imgRes = std::make_unique<ReadOnlyImageResource> (format, filter, extent.x, extent.y, extent.z, layerCount);
                         break;
                     default:
-                        GVK_BREAK_STR ("unexpected sampler type");
+                        RG_BREAK_STR ("unexpected sampler type");
                         break;
                 }
 
-                if (GVK_ERROR (imgRes == nullptr)) {
+                if (RG_ERROR (imgRes == nullptr)) {
                     continue;
                 }
 

@@ -11,7 +11,7 @@
 #include <vector>
 
 
-namespace Utils {
+namespace RG {
 
 RENDERGRAPH_DLL_EXPORT
 std::optional<std::string> ReadTextFile (const std::filesystem::path& filePath);
@@ -35,6 +35,6 @@ RENDERGRAPH_DLL_EXPORT
 void EnsureParentFolderExists (const std::filesystem::path& filePath);
 
 
-} // namespace Utils
+} // namespace RG
 
 #endif

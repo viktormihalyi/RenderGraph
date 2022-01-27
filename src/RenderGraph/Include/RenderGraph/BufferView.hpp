@@ -14,13 +14,13 @@
 #include <string_view>
 
 
-namespace GVK {
-
+namespace RG {
 class ShaderModule;
-
 }
 
-namespace SR {
+
+namespace RG {
+namespace Refl {
 
 class FieldContainer;
 class Field;
@@ -69,12 +69,12 @@ public:
     {
         static_assert (sizeof (T) >= 4, "there are no data types in glsl with less than 4 bytes");
 
-        if (GVK_ERROR (data == nullptr)) {
+        if (RG_ERROR (data == nullptr)) {
             return;
         }
 
-        GVK_ASSERT (type == Type::Variable);
-        GVK_ASSERT (sizeof (T) == size);
+        RG_ASSERT (type == Type::Variable);
+        RG_ASSERT (sizeof (T) == size);
 
         memcpy (data + offset, &other, size);
     }
@@ -100,11 +100,11 @@ public:
         static_assert (sizeof (T) >= 4, "there are no data types in glsl with less than 4 bytes");
 
         if (GetData () == nullptr) {
-            GVK_BREAK ();
+            RG_BREAK ();
             return;
         }
 
-        GVK_ASSERT (GetSize () == sizeof (T));
+        RG_ASSERT (GetSize () == sizeof (T));
         memcpy (GetData (), &other, GetSize ());
     }
 
@@ -114,18 +114,18 @@ public:
         static_assert (sizeof (T) >= 4, "there are no data types in glsl with less than 4 bytes");
 
         if (GetData () == nullptr) {
-            GVK_BREAK ();
+            RG_BREAK ();
             return;
         }
 
-        GVK_ASSERT (sizeof (T) * other.size () == GetSize ());
+        RG_ASSERT (sizeof (T) * other.size () == GetSize ());
         memcpy (GetData (), other.data (), GetSize ());
     }
 
     bool IsAllZero ()
     {
         if (GetData () == nullptr) {
-            GVK_BREAK ();
+            RG_BREAK ();
             return true;
         }
 
@@ -231,7 +231,8 @@ public:
 };
 
 
-} // namespace SR
+} // namespace Refl
+} // namespace RG
 
 
 #endif

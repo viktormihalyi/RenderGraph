@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace GVK {
+namespace RG {
 
 class CommandBuffer;
 
@@ -23,6 +23,6 @@ public:
     virtual std::string ToString () const { return ""; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -27,7 +27,7 @@ static msdfgen::FontHandle* GetFont (const std::filesystem::path& fontFile)
     if (ft == nullptr) {
         ft = msdfgen::initializeFreetype ();
     }
-    if (GVK_ERROR (ft == nullptr)) {
+    if (RG_ERROR (ft == nullptr)) {
         throw std::runtime_error ("failed to initialize freetype");
     }
 
@@ -38,7 +38,7 @@ static msdfgen::FontHandle* GetFont (const std::filesystem::path& fontFile)
     }
 
     msdfgen::FontHandle* font = msdfgen::loadFont (ft, fontFile.string ().c_str ());
-    if (GVK_ERROR (font == nullptr)) {
+    if (RG_ERROR (font == nullptr)) {
         throw std::runtime_error ("failed to load font");
     }
 
@@ -81,19 +81,19 @@ Font::~Font ()
 
 static msdfgen::Shape LoadShape (msdfgen::FontHandle* font, uint32_t unicode)
 {
-    if (GVK_ERROR (font == nullptr)) {
+    if (RG_ERROR (font == nullptr)) {
         throw std::runtime_error ("failed to load font");
     }
 
     msdfgen::Shape shape;
-    GVK_ASSERT (msdfgen::loadGlyph (shape, font, unicode));
+    RG_ASSERT (msdfgen::loadGlyph (shape, font, unicode));
 
     shape.inverseYAxis = true;
     shape.normalize ();
 
     msdfgen::edgeColoringSimple (shape, 3.0);
 
-    GVK_ASSERT (shape.validate ());
+    RG_ASSERT (shape.validate ());
 
     // shape.inverseYAxis = true;
 
@@ -104,7 +104,7 @@ static msdfgen::Shape LoadShape (msdfgen::FontHandle* font, uint32_t unicode)
 void Font::GetFontWhitespaceWidth (double& spaceAdvance, double& tabAdvance) const
 {
     const bool success = msdfgen::getFontWhitespaceWidth (spaceAdvance, tabAdvance, impl->fontHandle);
-    GVK_ASSERT (success);
+    RG_ASSERT (success);
 }
 
 
@@ -113,7 +113,7 @@ double Font::GetKerning (uint32_t unicode1, uint32_t unicode2) const
     double result = 0.0;
 
     const bool success = msdfgen::getKerning (result, impl->fontHandle, unicode1, unicode2);
-    GVK_ASSERT (success);
+    RG_ASSERT (success);
 
     return result;
 }
@@ -217,7 +217,7 @@ static GlyphData GetGlyph (msdfgen::FontHandle*                 fontHandle,
     result.height      = height;
     result.aspectRatio = glm::vec2 { asp.x, asp.y };
 
-    GVK::ImageData::FromDataFloat (result.data, width, height, Components).SaveTo (std::filesystem::current_path () / "temp" / (std::to_string (unicode) + ".png"));
+    RG::ImageData::FromDataFloat (result.data, width, height, Components).SaveTo (std::filesystem::current_path () / "temp" / (std::to_string (unicode) + ".png"));
 
     return result;
 }

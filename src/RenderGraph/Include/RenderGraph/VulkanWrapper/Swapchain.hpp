@@ -12,7 +12,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT SwapchainSettingsProvider {
 public:
@@ -90,7 +90,7 @@ private:
     };
 
     struct CreateResult {
-        GVK::MovablePtr<VkSwapchainKHR> handle;
+        RG::MovablePtr<VkSwapchainKHR> handle;
 
         uint32_t           imageCount;
         VkSurfaceFormatKHR surfaceFormat;
@@ -200,8 +200,8 @@ public:
 
     virtual uint32_t GetNextImageIndex (VkSemaphore signalSemaphore, VkFence fenceToSignal = VK_NULL_HANDLE) const override
     {
-        GVK_ASSERT (signalSemaphore == VK_NULL_HANDLE);
-        GVK_ASSERT (fenceToSignal == VK_NULL_HANDLE);
+        RG_ASSERT (signalSemaphore == VK_NULL_HANDLE);
+        RG_ASSERT (fenceToSignal == VK_NULL_HANDLE);
         return 0;
     }
 
@@ -215,6 +215,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

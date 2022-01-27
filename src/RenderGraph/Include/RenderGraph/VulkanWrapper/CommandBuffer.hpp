@@ -8,16 +8,16 @@
 #include "RenderGraph/VulkanWrapper/VulkanObject.hpp"
 #include "RenderGraph/VulkanWrapper/Command.hpp"
 
-namespace GVK {
+namespace RG {
 
 class Image;
 
 
 class RENDERGRAPH_DLL_EXPORT CommandBuffer : public VulkanObject {
 private:
-    GVK::MovablePtr<VkDevice>        device;
-    GVK::MovablePtr<VkCommandPool>   commandPool;
-    GVK::MovablePtr<VkCommandBuffer> handle;
+    RG::MovablePtr<VkDevice>        device;
+    RG::MovablePtr<VkCommandPool>   commandPool;
+    RG::MovablePtr<VkCommandBuffer> handle;
 
     bool canRecordCommands;
 
@@ -55,6 +55,6 @@ public:
 };
 
 
-} // namespace GVK
+} // namespace RG
 
 #endif

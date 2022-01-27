@@ -8,7 +8,7 @@
 constexpr bool LOG_WAITS = false;
 
 
-namespace GVK {
+namespace RG {
 
 Fence::Fence (VkDevice device, bool signaled)
     : device (device)
@@ -18,7 +18,7 @@ Fence::Fence (VkDevice device, bool signaled)
     fenceInfo.sType             = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags             = signaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0;
 
-    if (GVK_ERROR (vkCreateFence (device, &fenceInfo, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateFence (device, &fenceInfo, nullptr, &handle) != VK_SUCCESS)) {
         spdlog::critical ("VkFence creation failed.");
         throw std::runtime_error ("failed to create fence");
     }
@@ -44,11 +44,11 @@ void Fence::Wait () const
 {
     if constexpr (LOG_WAITS) {
         
-        const GVK::TimePoint start = GVK::TimePoint::SinceEpoch ();
+        const RG::TimePoint start = RG::TimePoint::SinceEpoch ();
 
         WaitImpl ();
         
-        const GVK::TimePoint end = GVK::TimePoint::SinceEpoch ();
+        const RG::TimePoint end = RG::TimePoint::SinceEpoch ();
 
         const std::string fenceId = !GetName ().empty () ? GetName () : GetUUID ().GetValue ();
         spdlog::info  ("fence \"{}\" waited {} ms", fenceId, (end - start).AsMilliseconds ());
@@ -66,4 +66,4 @@ void Fence::Reset () const
     vkResetFences (device, 1, &handle);
 }
 
-} // namespace GVK
+} // namespace RG

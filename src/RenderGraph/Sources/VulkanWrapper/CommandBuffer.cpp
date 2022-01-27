@@ -6,7 +6,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace GVK {
+namespace RG {
 
     
 CommandBuffer::CommandBuffer (VkDevice device, VkCommandPool commandPool)
@@ -21,7 +21,7 @@ CommandBuffer::CommandBuffer (VkDevice device, VkCommandPool commandPool)
     commandBufferAllocInfo.level                       = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocInfo.commandBufferCount          = 1;
 
-    if (GVK_ERROR (vkAllocateCommandBuffers (device, &commandBufferAllocInfo, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkAllocateCommandBuffers (device, &commandBufferAllocInfo, &handle) != VK_SUCCESS)) {
         spdlog::critical ("VkCommandBuffer creation failed.");
         throw std::runtime_error ("failed to allocate command buffer");
     }
@@ -52,7 +52,7 @@ void CommandBuffer::Begin (VkCommandBufferUsageFlags flags)
     beginInfo.flags                    = flags;
     beginInfo.pInheritanceInfo         = nullptr;
 
-    if (GVK_ERROR (vkBeginCommandBuffer (handle, &beginInfo) != VK_SUCCESS)) {
+    if (RG_ERROR (vkBeginCommandBuffer (handle, &beginInfo) != VK_SUCCESS)) {
         throw std::runtime_error ("commandbuffer begin failed");
     }
 
@@ -62,7 +62,7 @@ void CommandBuffer::Begin (VkCommandBufferUsageFlags flags)
 
 void CommandBuffer::End ()
 {
-    if (GVK_ERROR (vkEndCommandBuffer (handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkEndCommandBuffer (handle) != VK_SUCCESS)) {
         throw std::runtime_error ("commandbuffer end failed");
     }
 
@@ -72,7 +72,7 @@ void CommandBuffer::End ()
 
 void CommandBuffer::Reset (bool releaseResources)
 {
-    if (GVK_ERROR (vkResetCommandBuffer (handle, (releaseResources) ? VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT : 0) != VK_SUCCESS)) {
+    if (RG_ERROR (vkResetCommandBuffer (handle, (releaseResources) ? VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT : 0) != VK_SUCCESS)) {
         throw std::runtime_error ("commandbuffer reset failed");
     }
 

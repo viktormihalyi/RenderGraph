@@ -12,7 +12,8 @@
 #include <vulkan/vulkan.h>
 
 
-namespace SR {
+namespace RG {
+namespace Refl {
 
 
 // clang-format off
@@ -195,6 +196,7 @@ RENDERGRAPH_DLL_EXPORT
 VkFormat FieldTypeToVkFormat (FieldType fieldType);
 
 
-} // namespace SR
+} // namespace Refl
+} // namespace RG
 
 #endif

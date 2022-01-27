@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace Utils {
+namespace RG {
 
 RENDERGRAPH_DLL_EXPORT
 std::shared_ptr<spdlog::logger> GetLogger ();
@@ -15,7 +15,7 @@ std::shared_ptr<spdlog::logger> GetLogger ();
 RENDERGRAPH_DLL_EXPORT
 std::shared_ptr<spdlog::logger> GetLogger (const std::string& customFileName);
 
-} // namespace Utils
+} // namespace RG
 
 
 #endif

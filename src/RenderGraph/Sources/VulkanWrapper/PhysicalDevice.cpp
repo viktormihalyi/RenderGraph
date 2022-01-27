@@ -8,7 +8,7 @@
 #include <functional>
 
 
-namespace GVK {
+namespace RG {
 
 
 static std::optional<uint32_t> AcceptFirstPresentSupport (VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, const std::vector<VkQueueFamilyProperties>& queueFamilies)
@@ -64,7 +64,7 @@ static PhysicalDevice::QueueFamilies FindQueueFamilyIndices (VkPhysicalDevice ph
     result.transfer     = AcceptFirstWithFlag (VK_QUEUE_TRANSFER_BIT) (physicalDevice, surface, queueFamilies);
 
     if (result.presentation) {
-        GVK_ASSERT (result.graphics == result.presentation); // TODO handle different queue indices ...
+        RG_ASSERT (result.graphics == result.presentation); // TODO handle different queue indices ...
     }
 
     return result;
@@ -121,8 +121,8 @@ static VkPhysicalDevice FindPhysicalDevice (VkInstance instance, const std::set<
     RemoveBadCandidate ([&] (const PhysicalDeviceCandidate& candidate) {
         auto extensionNameAccessor = [] (const VkExtensionProperties& props) { return props.extensionName; };
 
-        const std::set<std::string> supportedDeviceExtensionSet   = Utils::ToSet<VkExtensionProperties, std::string> (candidate.extensionProperties, extensionNameAccessor);
-        const std::set<std::string> unsupportedDeviceExtensionSet = Utils::SetDiff (requestedDeviceExtensionSet, supportedDeviceExtensionSet);
+        const std::set<std::string> supportedDeviceExtensionSet   = RG::ToSet<VkExtensionProperties, std::string> (candidate.extensionProperties, extensionNameAccessor);
+        const std::set<std::string> unsupportedDeviceExtensionSet = RG::SetDiff (requestedDeviceExtensionSet, supportedDeviceExtensionSet);
 
         return !unsupportedDeviceExtensionSet.empty ();
     });
@@ -143,7 +143,7 @@ static VkPhysicalDevice FindPhysicalDevice (VkInstance instance, const std::set<
     if (!selectedCandidate.has_value () && !candidates.empty ())
         selectedCandidate = candidates[0];
 
-    if GVK_ERROR (!selectedCandidate.has_value ())
+    if RG_ERROR (!selectedCandidate.has_value ())
         throw std::runtime_error ("No physical device available");
 
     return selectedCandidate->handle;
@@ -175,4 +175,4 @@ bool PhysicalDevice::CheckSurfaceSupported (VkSurfaceKHR surface) const
     return handle == findForSurface.handle;
 }
 
-} // namespace GVK
+} // namespace RG

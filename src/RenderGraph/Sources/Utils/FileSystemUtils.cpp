@@ -7,13 +7,13 @@
 #include <string>
 
 
-namespace Utils {
+namespace RG {
 
 
 template<typename T>
 static T ReadOpenedFile (std::ifstream& file)
 {
-    if (GVK_ERROR (!file.is_open ())) {
+    if (RG_ERROR (!file.is_open ())) {
         return T ();
     }
 
@@ -86,7 +86,7 @@ static std::optional<T> OpenAndReadFile (const std::filesystem::path& filePath)
 
     T result = ReadOpenedFile<T> (file);
 
-    if (GVK_ERROR (file.fail ())) {
+    if (RG_ERROR (file.fail ())) {
         return std::nullopt;
     }
 
@@ -114,7 +114,7 @@ std::optional<std::vector<uint32_t>> ReadBinaryFile4Byte (const std::filesystem:
         return std::nullopt;
     }
 
-    GVK_ASSERT (readResult->size () % 4 == 0);
+    RG_ASSERT (readResult->size () % 4 == 0);
     size_t binarySize = readResult->size () / 4;
     while (binarySize % 4 != 0) {
         ++binarySize;
@@ -127,4 +127,4 @@ std::optional<std::vector<uint32_t>> ReadBinaryFile4Byte (const std::filesystem:
     return result;
 }
 
-} // namespace Utils
+} // namespace RG

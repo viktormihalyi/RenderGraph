@@ -16,7 +16,7 @@
 #include "spdlog/spdlog.h"
 
 
-namespace GVK {
+namespace RG {
 
 const ImageData ImageData::Empty { 4, 0, 0, {} };
 
@@ -51,7 +51,7 @@ void ImageData::FillBuffer (const DeviceExtra& device, const Image& image, uint3
     const size_t width             = (image.GetWidth ());
     const size_t height            = (image.GetHeight ());
 
-    GVK_ASSERT (bufferSize >= width * height * components * componentByteSize);
+    RG_ASSERT (bufferSize >= width * height * components * componentByteSize);
 
     {
         Buffer dstBuffer (device.GetAllocator (), width * height * components * componentByteSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT, Buffer::MemoryLocation::CPU);
@@ -106,7 +106,7 @@ ImageData::ImageData (const std::filesystem::path& path, const uint32_t componen
     int            w, h, readComponents;
     unsigned char* stbiData = stbi_load (path.string ().c_str (), &w, &h, &readComponents, components);
 
-    if (GVK_ERROR (stbiData == nullptr)) {
+    if (RG_ERROR (stbiData == nullptr)) {
         width  = 0;
         height = 0;
         return;
@@ -124,7 +124,7 @@ ImageData::ImageData (const std::filesystem::path& path, const uint32_t componen
 
 ImageData ImageData::FromDataUint (const std::vector<uint8_t>& data, uint32_t width, uint32_t height, uint32_t components)
 {
-    GVK_ASSERT (data.size () == width * height * components);
+    RG_ASSERT (data.size () == width * height * components);
 
     ImageData result;
     result.data       = data;
@@ -167,7 +167,7 @@ bool ImageData::operator== (const ImageData& other) const
         return false;
     }
 
-    GVK_ASSERT (data.size () == other.data.size ());
+    RG_ASSERT (data.size () == other.data.size ());
 
     return memcmp (data.data (), other.data.data (), data.size ()) == 0;
 }
@@ -175,7 +175,7 @@ bool ImageData::operator== (const ImageData& other) const
 
 ImageData::ComparisonResult ImageData::CompareTo (const ImageData& other) const
 {
-    if (GVK_ERROR (width != other.width || height != other.height)) {
+    if (RG_ERROR (width != other.width || height != other.height)) {
         return ComparisonResult { false, nullptr };
     }
 
@@ -233,7 +233,7 @@ ImageData::ComparisonResult ImageData::CompareTo (const ImageData& other) const
             }
         }
     } else {
-        GVK_BREAK_STR ("not supported components");
+        RG_BREAK_STR ("not supported components");
     }
     
     return result;
@@ -242,15 +242,15 @@ ImageData::ComparisonResult ImageData::CompareTo (const ImageData& other) const
 
 uint32_t ImageData::GetByteCount () const
 {
-    GVK_ASSERT (data.size () == width * height * components);
+    RG_ASSERT (data.size () == width * height * components);
     return static_cast<uint32_t> (data.size ());
 }
 
 
 void ImageData::SaveTo (const std::filesystem::path& path) const
 {
-    Utils::EnsureParentFolderExists (path);
-    GVK_ASSERT (width * height * components * componentByteSize == data.size ());
+    RG::EnsureParentFolderExists (path);
+    RG_ASSERT (width * height * components * componentByteSize == data.size ());
 
     const int result = stbi_write_png (path.string ().c_str (),
                                        static_cast<int> (width),
@@ -259,7 +259,7 @@ void ImageData::SaveTo (const std::filesystem::path& path) const
                                        data.data (),
                                        static_cast<int> (width * components));
 
-    if (GVK_VERIFY (result == 1)) {
+    if (RG_VERIFY (result == 1)) {
         spdlog::info ("Saved image to {}.", path.string ());
     } else {
         spdlog::error ("Error saving image to {}.", path.string ());
@@ -293,4 +293,4 @@ void ImageData::ConvertBGRToRGB ()
     }
 }
 
-} // namespace GVK
+} // namespace RG

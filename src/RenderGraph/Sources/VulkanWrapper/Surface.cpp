@@ -11,7 +11,7 @@
 #include <vulkan/vulkan_win32.h>
 #endif
 
-namespace GVK {
+namespace RG {
 
 Surface::Surface (VkInstance instance, VkSurfaceKHR&& handle)
     : instance (instance)
@@ -31,7 +31,7 @@ Surface::Surface (PlatformSpecificSelector, VkInstance instance, void* hwnd)
     info.hinstance                   = GetModuleHandle (nullptr);
     info.hwnd                        = static_cast<HWND> (hwnd);
 
-    if (GVK_ERROR (vkCreateWin32SurfaceKHR (instance, &info, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateWin32SurfaceKHR (instance, &info, nullptr, &handle) != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create win32 VkSurface");
     }
 }
@@ -42,7 +42,7 @@ Surface::Surface (PlatformSpecificSelector, VkInstance instance, void* handle)
     : instance (instance)
     , handle (VK_NULL_HANDLE)
 {
-    GVK_BREAK_STR ("no implementation for this platform");
+    RG_BREAK_STR ("no implementation for this platform");
     throw std::runtime_error ("unsupported platform for creating VkSurface");
 }
 
@@ -57,4 +57,4 @@ Surface::~Surface ()
     }
 }
 
-} // namespace GVK
+} // namespace RG

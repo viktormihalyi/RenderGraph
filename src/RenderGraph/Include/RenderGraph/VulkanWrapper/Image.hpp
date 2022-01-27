@@ -11,7 +11,7 @@
 #include <vulkan/vulkan.h>
 #include <optional>
 
-namespace GVK {
+namespace RG {
 
 class ImageBuilder;
 class CommandBuffer;
@@ -31,7 +31,7 @@ public:
     };
 
 protected:
-    GVK::MovablePtr<VkImage> handle;
+    RG::MovablePtr<VkImage> handle;
 
 private:
     VkDevice      device;
@@ -192,6 +192,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

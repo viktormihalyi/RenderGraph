@@ -6,14 +6,14 @@
 namespace RG {
 namespace FromShaderReflection {
 
-std::vector<VkVertexInputAttributeDescription> GetVertexAttributes (const GVK::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& IsInputInstanced)
+std::vector<VkVertexInputAttributeDescription> GetVertexAttributes (const RG::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& IsInputInstanced)
 {
     std::vector<VkVertexInputAttributeDescription> result;
 
     uint32_t currentOffsetVertex   = 0;
     uint32_t currentOffsetInstance = 0;
 
-    for (const SR::Input& input : reflection.inputs) {
+    for (const RG::Refl::Input& input : reflection.inputs) {
         VkVertexInputAttributeDescription attrib = {};
         attrib.binding                           = 0;
         attrib.location                          = input.location;
@@ -34,7 +34,7 @@ std::vector<VkVertexInputAttributeDescription> GetVertexAttributes (const GVK::S
 }
 
 
-std::vector<VkVertexInputBindingDescription> GetVertexBindings (const GVK::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& IsInputInstanced)
+std::vector<VkVertexInputBindingDescription> GetVertexBindings (const RG::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& IsInputInstanced)
 {
     if (reflection.inputs.empty ()) {
         return {};
@@ -45,7 +45,7 @@ std::vector<VkVertexInputBindingDescription> GetVertexBindings (const GVK::Shade
     uint32_t fullSizeVertex   = 0;
     uint32_t fullSizeInstance = 0;
 
-    for (const SR::Input& input : reflection.inputs) {
+    for (const RG::Refl::Input& input : reflection.inputs) {
         if (IsInputInstanced (input.name)) {
             fullSizeInstance += input.sizeInBytes;
         } else {

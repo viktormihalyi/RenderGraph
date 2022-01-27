@@ -8,7 +8,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 struct RENDERGRAPH_DLL_EXPORT InstanceSettings {
     std::vector<const char*> extensions;
@@ -22,7 +22,7 @@ extern RENDERGRAPH_DLL_EXPORT const InstanceSettings instanceReleaseMode;
 
 class RENDERGRAPH_DLL_EXPORT Instance : public VulkanObject, public Nonmovable {
 private:
-    GVK::MovablePtr<VkInstance> handle;
+    RG::MovablePtr<VkInstance> handle;
 
 public:
     Instance (const std::vector<const char*>& instanceExtensions, const std::vector<const char*>& instanceLayers);
@@ -37,6 +37,6 @@ public:
     operator VkInstance () const { return handle; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

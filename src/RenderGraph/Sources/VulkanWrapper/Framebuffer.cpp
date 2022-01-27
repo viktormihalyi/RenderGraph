@@ -3,7 +3,7 @@
 #include "Utils/Utils.hpp"
 #include "Utils/Assert.hpp"
 
-namespace GVK {
+namespace RG {
 
 
 Framebuffer::Framebuffer (VkDevice device, VkRenderPass renderPass, const std::vector<VkImageView>& attachments, uint32_t width, uint32_t height)
@@ -23,7 +23,7 @@ Framebuffer::Framebuffer (VkDevice device, VkRenderPass renderPass, const std::v
     framebufferInfo.layers                  = 1;
 
     VkResult result = vkCreateFramebuffer (device, &framebufferInfo, nullptr, &handle);
-    if (GVK_ERROR (result != VK_SUCCESS)) {
+    if (RG_ERROR (result != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create framebuffer");
     }
 }
@@ -55,7 +55,7 @@ Framebuffer::Framebuffer (VkDevice device, VkRenderPass renderPass, std::vector<
     framebufferInfo.layers                  = 1;
 
     VkResult result = vkCreateFramebuffer (device, &framebufferInfo, nullptr, &handle);
-    if (GVK_ERROR (result != VK_SUCCESS)) {
+    if (RG_ERROR (result != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create framebuffer");
     }
 }
@@ -70,5 +70,5 @@ Framebuffer::~Framebuffer ()
 }
 
 
-} // namespace GVK
+} // namespace RG
 

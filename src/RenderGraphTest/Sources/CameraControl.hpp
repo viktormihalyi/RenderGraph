@@ -6,7 +6,7 @@
 #include "InputState.hpp"
 #include "RenderGraph/Window/Window.hpp"
 
-namespace GVK {
+namespace RG {
 
 class CameraControl : public EventObserver {
 private:
@@ -67,6 +67,6 @@ private:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

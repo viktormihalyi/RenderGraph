@@ -10,7 +10,7 @@
 #include "RenderGraph/VulkanWrapper/DeviceExtra.hpp"
 #include "RenderGraph/VulkanWrapper/Image.hpp"
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT ImageData {
 public:

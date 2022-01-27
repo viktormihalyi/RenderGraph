@@ -3,7 +3,7 @@
 
 #include <functional>
 
-namespace GVK {
+namespace RG {
 
 template<typename T>
 struct Lazy {
@@ -44,6 +44,6 @@ public:
     inline operator const T& () { return Get (); }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

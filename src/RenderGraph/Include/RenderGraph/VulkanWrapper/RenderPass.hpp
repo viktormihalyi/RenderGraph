@@ -7,12 +7,12 @@
 #include "RenderGraph/Utils/MovablePtr.hpp"
 #include "VulkanObject.hpp"
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ RenderPass : public VulkanObject {
 private:
     VkDevice                      device;
-    GVK::MovablePtr<VkRenderPass> handle;
+    RG::MovablePtr<VkRenderPass> handle;
 
 public:
     RenderPass (VkDevice                                    device,
@@ -30,7 +30,7 @@ public:
         renderPassInfo.dependencyCount        = static_cast<uint32_t> (subpassDependencies.size ());
         renderPassInfo.pDependencies          = subpassDependencies.empty () ? nullptr : subpassDependencies.data ();
 
-        if (GVK_ERROR (vkCreateRenderPass (device, &renderPassInfo, nullptr, &handle) != VK_SUCCESS)) {
+        if (RG_ERROR (vkCreateRenderPass (device, &renderPassInfo, nullptr, &handle) != VK_SUCCESS)) {
             throw std::runtime_error ("failed to create renderpass");
         }
     }
@@ -54,6 +54,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

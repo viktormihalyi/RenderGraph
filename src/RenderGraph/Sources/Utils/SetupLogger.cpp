@@ -13,7 +13,7 @@
 #include "spdlog/sinks/rotating_file_sink.h"
 
 
-namespace Utils {
+namespace RG {
 
 static CommandLineOnOffCallbackFlag logTraceFlag { "--logTrace", "Set logger to trace level.", [] () { GetLogger ()->set_level (spdlog::level::trace); } };
 static CommandLineOnOffCallbackFlag logDebugFlag { "--logDebug", "Set logger to debug level.", [] () { GetLogger ()->set_level (spdlog::level::debug); } };
@@ -61,7 +61,7 @@ std::shared_ptr<spdlog::logger> GetLogger ()
     return GetLogger (defaultLogFileName);
 }
 
-} // namespace Utils
+} // namespace RG
 
 
-StaticInit utilsLogInitializer (std::bind (spdlog::set_default_logger, Utils::GetLogger ()));
+StaticInit utilsLogInitializer (std::bind (spdlog::set_default_logger, RG::GetLogger ()));

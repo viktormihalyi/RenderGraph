@@ -15,13 +15,13 @@ private:
         glm::vec2 uv;
     };
 
-    GVK::VertexBufferTransferable<Vertex> vertexBuffer;
-    GVK::IndexBufferTransferable          indexBuffer;
+    RG::VertexBufferTransferable<Vertex> vertexBuffer;
+    RG::IndexBufferTransferable          indexBuffer;
 
     std::unique_ptr<DrawableInfo> info;
 
 public:
-    FullscreenQuad (const GVK::DeviceExtra& device)
+    FullscreenQuad (const RG::DeviceExtra& device)
         : vertexBuffer (device, 4, { VK_FORMAT_R32G32_SFLOAT, VK_FORMAT_R32G32_SFLOAT }, VK_VERTEX_INPUT_RATE_VERTEX)
         , indexBuffer (device, 6)
     {

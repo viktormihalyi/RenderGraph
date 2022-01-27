@@ -15,7 +15,7 @@
 #include <set>
 #include <string>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT PhysicalDevice final : public Noncopyable {
 public:
@@ -28,7 +28,7 @@ public:
 
 private:
     VkInstance                        instance;
-    GVK::MovablePtr<VkPhysicalDevice> handle;
+    RG::MovablePtr<VkPhysicalDevice> handle;
     std::set<std::string>             requestedDeviceExtensionSet;
     QueueFamilies                     queueFamilies;
 
@@ -63,6 +63,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -13,7 +13,8 @@
 #include "spdlog/spdlog.h"
 
 
-namespace SR {
+namespace RG {
+namespace Refl {
 
 
 Field::Field ()
@@ -66,7 +67,7 @@ uint32_t Field::GetSize () const
     }
 
     if (IsStruct ()) {
-        if (GVK_ERROR (structFields.empty ())) {
+        if (RG_ERROR (structFields.empty ())) {
             return 0;
         }
 
@@ -86,7 +87,7 @@ const std::vector<std::unique_ptr<Field>>& Field::GetFields () const
 
 bool BufferObject::HasFixedSize () const
 {
-    if (GVK_ERROR (fields.empty ())) {
+    if (RG_ERROR (fields.empty ())) {
         return false;
     }
 
@@ -99,13 +100,13 @@ bool BufferObject::HasFixedSize () const
 
 uint32_t BufferObject::GetFullSize () const
 {
-    if (GVK_ERROR (fields.empty ())) {
+    if (RG_ERROR (fields.empty ())) {
         return 0;
     }
 
     const Field& lastField = *fields[fields.size () - 1];
 
-    if (GVK_ERROR (lastField.IsArray () && !lastField.IsFixedSizeArray ())) {
+    if (RG_ERROR (lastField.IsArray () && !lastField.IsFixedSizeArray ())) {
         return 0;
     }
 
@@ -213,7 +214,7 @@ static uint32_t BaseTypeToByteSize (spirv_cross::SPIRType::BaseType b)
             return 8;
 
         default:
-            GVK_BREAK_STR ("bad BaseType");
+            RG_BREAK_STR ("bad BaseType");
             return 4;
     }
 }
@@ -348,7 +349,7 @@ static std::optional<FieldType> BaseTypeNMToSRFieldType (spirv_cross::SPIRType::
             }
 
         default:
-            GVK_BREAK ();
+            RG_BREAK ();
             return FieldType::Unknown;
     }
 }
@@ -371,7 +372,7 @@ static void IterateTypeTree (spirv_cross::Compiler& compiler, spirv_cross::TypeI
         f->size                  = (Mtype.width * Mtype.vecsize * Mtype.columns) / 8;
 
         const std::optional<FieldType> fieldType = BaseTypeNMToSRFieldType (Mtype.basetype, Mtype.vecsize, Mtype.columns);
-        if (GVK_ERROR (!fieldType.has_value ()))
+        if (RG_ERROR (!fieldType.has_value ()))
             continue;
 
         f->type = *fieldType;
@@ -393,8 +394,8 @@ static void IterateTypeTree (spirv_cross::Compiler& compiler, spirv_cross::TypeI
             }
         }
 
-        GVK_ASSERT (f->arraySize.size () == f->arrayStride.size ());
-        GVK_ASSERT (f->arraySize.size () <= 8);
+        RG_ASSERT (f->arraySize.size () == f->arrayStride.size ());
+        RG_ASSERT (f->arraySize.size () <= 8);
 
         auto& structFields = f->structFields;
 
@@ -439,7 +440,7 @@ static std::vector<std::shared_ptr<BufferObject>> GetBufferObjectsFromBinary (Sp
 
         // using arrays on ubos will create seperate bindings,
         // eg. array of 4 on binding 2 will create 4 different bindings: 2, 3, 4, 5
-        GVK_ASSERT (arraySize == 1);
+        RG_ASSERT (arraySize == 1);
 
         std::shared_ptr<BufferObject> root = std::make_unique<BufferObject> ();
         root->name                         = resource.name;
@@ -453,7 +454,7 @@ static std::vector<std::shared_ptr<BufferObject>> GetBufferObjectsFromBinary (Sp
 
         root->hasDeclaredStructSize = declaredStructSize != 0;
 
-        GVK_ASSERT (!root->hasDeclaredStructSize || declaredStructSize == fullSize);
+        RG_ASSERT (!root->hasDeclaredStructSize || declaredStructSize == fullSize);
 
         ubos.push_back (root);
     }
@@ -501,7 +502,7 @@ std::vector<Output> GetOutputsFromBinary (SpirvParser& compiler_)
         output.arraySize = !type.array.empty () ? type.array[0] : 1;
 
         const std::optional<FieldType> fieldType = BaseTypeNMToSRFieldType (type.basetype, type.vecsize, type.columns);
-        if (GVK_ERROR (!fieldType.has_value ()))
+        if (RG_ERROR (!fieldType.has_value ()))
             continue;
 
         output.type = *fieldType;
@@ -561,7 +562,7 @@ VkFormat FieldTypeToVkFormat (FieldType fieldType)
         case FieldType::Dvec4: return VK_FORMAT_R64G64B64A64_SFLOAT;
 
         default:
-            GVK_BREAK_STR ("no");
+            RG_BREAK_STR ("no");
             throw std::runtime_error ("unable to convert FieldType to VkFormat");
     }
 }
@@ -587,7 +588,7 @@ std::vector<SubpassInput> GetSubpassInputsFromBinary (SpirvParser& compiler_)
         inp.arraySize    = !type.array.empty () ? type.array[0] : 1;
 
         const std::optional<FieldType> fieldType = BaseTypeNMToSRFieldType (type.basetype, type.vecsize, type.columns);
-        if (GVK_ERROR (!fieldType.has_value ()))
+        if (RG_ERROR (!fieldType.has_value ()))
             continue;
 
         inp.type = *fieldType;
@@ -623,7 +624,7 @@ std::vector<Input> GetInputsFromBinary (SpirvParser& compiler_)
         inp.sizeInBytes = BaseTypeNMToByteSize (type.basetype, type.vecsize, type.columns);
 
         const std::optional<FieldType> fieldType = BaseTypeNMToSRFieldType (type.basetype, type.vecsize, type.columns);
-        if (GVK_ERROR (!fieldType.has_value ()))
+        if (RG_ERROR (!fieldType.has_value ()))
             continue;
 
         inp.type = *fieldType;
@@ -648,7 +649,7 @@ static Sampler::Type SpvDimToSamplerType (spv::Dim dim)
         case spv::Dim::DimCube: return Sampler::Type::SamplerCube;
 
         default:
-            GVK_BREAK ();
+            RG_BREAK ();
             throw std::runtime_error ("not supported type");
     }
 }
@@ -673,7 +674,7 @@ std::vector<Sampler> GetSamplersFromBinary (SpirvParser& compiler_)
         sampler.type          = SpvDimToSamplerType (type.image.dim);
         sampler.arraySize     = !type.array.empty () ? type.array[0] : 1;
 
-        GVK_ASSERT (type.array.empty () || type.array.size () == 1);
+        RG_ASSERT (type.array.empty () || type.array.size () == 1);
 
         result.push_back (sampler);
     }
@@ -690,7 +691,7 @@ std::vector<Sampler> GetSamplersFromBinary (SpirvParser& compiler_)
     case enumname::type:                    \
         return #type;
 #define ENUM_TO_STRING_DEFAULT(enumname) \
-    default: GVK_BREAK (); return #enumname "::[unknown]";
+    default: RG_BREAK (); return #enumname "::[unknown]";
 
 
 std::string FieldTypeToString (FieldType fieldType)
@@ -747,4 +748,5 @@ std::string FieldTypeToString (FieldType fieldType)
     }
 }
 
-} // namespace SR
+} // namespace Refl
+} // namespace RG

@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-namespace GVK {
+namespace RG {
 
 struct ShaderType {
     uint32_t size;
@@ -42,7 +42,7 @@ static ShaderType GetShaderTypeFromFormat (VkFormat format)
         case VK_FORMAT_R32G32B32A32_UINT: return vec4;
 
         default:
-            GVK_BREAK ();
+            RG_BREAK ();
             throw std::runtime_error ("unhandled VkFormat value");
     }
 }
@@ -83,7 +83,7 @@ VertexInputInfo::VertexInputInfo (const std::vector<VkFormat>& vertexInputFormat
 
 void BufferTransferable::TransferFromCPUToGPU (const void* data, size_t size) const
 {
-    GVK_ASSERT (size == bufferSize);
+    RG_ASSERT (size == bufferSize);
     bufferCPUMapping.Copy (data, size);
     CopyBuffer (device, bufferCPU, bufferGPU, bufferSize);
 }

@@ -4,7 +4,7 @@
 #include "Utils/BuildType.hpp"
 
 
-namespace GVK {
+namespace RG {
 
 VulkanObject::VulkanObject () = default;
 
@@ -23,7 +23,7 @@ void VulkanObject::SetName (const DeviceExtra& device, const std::string& value)
         nameInfo.pObjectName  = value.c_str ();
 
         const VkResult result = GetVulkanFunction<PFN_vkSetDebugUtilsObjectNameEXT> (device.instance, "vkSetDebugUtilsObjectNameEXT") (device, &nameInfo);
-        GVK_VERIFY (result == VK_SUCCESS);
+        RG_VERIFY (result == VK_SUCCESS);
     }
 
     name = value;

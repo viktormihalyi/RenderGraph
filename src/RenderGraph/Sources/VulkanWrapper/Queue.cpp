@@ -5,7 +5,7 @@
 #include "spdlog/spdlog.h"
 
 
-namespace GVK {
+namespace RG {
 
 Queue dummyQueue (VK_NULL_HANDLE);
 
@@ -47,7 +47,7 @@ void Queue::Submit (const std::vector<VkSemaphore>&          waitSemaphores,
     submittedCmdBufferHandles.reserve (commandBuffers.size ());
 
     for (CommandBuffer* cmd : commandBuffers) {
-        GVK_ASSERT (cmd != nullptr);
+        RG_ASSERT (cmd != nullptr);
         submittedCmdBufferHandles.push_back (cmd->GetHandle ());
     }
 

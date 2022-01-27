@@ -11,7 +11,7 @@
 #include <glm/glm.hpp>
 #pragma warning(pop)
 
-namespace GVK {
+namespace RG {
 
 class Camera {
 public:
@@ -71,6 +71,6 @@ public:
     void  SetFrontAndBackPlane (float back, float front);
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

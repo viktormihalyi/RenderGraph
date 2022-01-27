@@ -15,7 +15,7 @@ static std::array<uint8_t, 16> GenerateUUID ()
     UUID uuid;
 
     RPC_STATUS err = UuidCreate (&uuid);
-    GVK_VERIFY (err == RPC_S_OK);
+    RG_VERIFY (err == RPC_S_OK);
 
     std::array<uint8_t, 16> result;
     memcpy (result.data (), &uuid, 16);
@@ -62,19 +62,19 @@ static std::array<uint8_t, 16> GenerateUUID ()
 #endif
 
 
-GVK::UUID::UUID ()
+RG::UUID::UUID ()
     : data (GenerateUUID ())
 {
 }
 
 
-GVK::UUID::UUID (std::nullptr_t)
+RG::UUID::UUID (std::nullptr_t)
     : data ({ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 })
 {
 }
 
 
-std::string GVK::UUID::GetValue () const
+std::string RG::UUID::GetValue () const
 {
     char str[39] = {};
     snprintf (str, sizeof (str),

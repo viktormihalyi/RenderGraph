@@ -7,7 +7,7 @@
 #include "Device.hpp"
 #include "RenderGraph/Utils/MovablePtr.hpp"
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT DeviceMemory : public VulkanObject {
 public:
@@ -18,7 +18,7 @@ private:
     VkDevice                        device;
     size_t                          allocationSize;
     uint32_t                        memoryTypeIndex;
-    GVK::MovablePtr<VkDeviceMemory> handle;
+    RG::MovablePtr<VkDeviceMemory> handle;
 
 public:
     DeviceMemory (VkDevice device, const size_t allocationSize, const uint32_t memoryTypeIndex);
@@ -37,6 +37,6 @@ public:
     size_t GetSize () const { return allocationSize; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

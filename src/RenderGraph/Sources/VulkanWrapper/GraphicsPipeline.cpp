@@ -2,7 +2,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace GVK {
+namespace RG {
 
 GraphicsPipeline::GraphicsPipeline (VkDevice                                              device,
                     uint32_t                                              width,
@@ -130,7 +130,7 @@ GraphicsPipeline::GraphicsPipeline (VkDevice                                    
     pipelineInfo.basePipelineHandle           = VK_NULL_HANDLE; // Optional
     pipelineInfo.basePipelineIndex            = -1;             // Optional
 
-    if (GVK_ERROR (vkCreateGraphicsPipelines (device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateGraphicsPipelines (device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &handle) != VK_SUCCESS)) {
         spdlog::critical ("VkPipeline creation failed.");
         throw std::runtime_error ("failed to create pipeline");
     }

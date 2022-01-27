@@ -23,7 +23,7 @@ namespace VW {
 class Event;
 }
 
-namespace GVK {
+namespace RG {
 class SwapchainProvider;
 class Image;
 class ImageView2D;
@@ -48,11 +48,11 @@ public:
 
     virtual void Compile (const GraphSettings&) = 0;
 
-    virtual void OnPreRead (uint32_t /* resourceIndex */, GVK::CommandBuffer&) {};
-    virtual void OnPreWrite (uint32_t /* resourceIndex */, GVK::CommandBuffer&) {};
-    virtual void OnPostWrite (uint32_t /* resourceIndex */, GVK::CommandBuffer&) {};
-    virtual void OnGraphExecutionStarted (uint32_t /* resourceIndex */, GVK::CommandBuffer&) {};
-    virtual void OnGraphExecutionEnded (uint32_t /* resourceIndex */, GVK::CommandBuffer&) {};
+    virtual void OnPreRead (uint32_t /* resourceIndex */, RG::CommandBuffer&) {};
+    virtual void OnPreWrite (uint32_t /* resourceIndex */, RG::CommandBuffer&) {};
+    virtual void OnPostWrite (uint32_t /* resourceIndex */, RG::CommandBuffer&) {};
+    virtual void OnGraphExecutionStarted (uint32_t /* resourceIndex */, RG::CommandBuffer&) {};
+    virtual void OnGraphExecutionEnded (uint32_t /* resourceIndex */, RG::CommandBuffer&) {};
 };
 
 
@@ -71,8 +71,8 @@ public:
     virtual VkImageLayout            GetFinalLayout () const                  = 0;
     virtual VkFormat                 GetFormat () const                       = 0;
     virtual uint32_t                 GetLayerCount () const                   = 0;
-    virtual std::vector<GVK::Image*> GetImages () const                       = 0;
-    virtual std::vector<GVK::Image*> GetImages (uint32_t resourceIndex) const = 0;
+    virtual std::vector<RG::Image*> GetImages () const                       = 0;
+    virtual std::vector<RG::Image*> GetImages (uint32_t resourceIndex) const = 0;
 
 
     std::function<VkFormat ()> GetFormatProvider () const;
@@ -102,10 +102,10 @@ protected:
         static const VkFormat FormatRGBA;
         static const VkFormat FormatRGB;
 
-        std::unique_ptr<GVK::Image>                    image;
-        std::vector<std::unique_ptr<GVK::ImageView2D>> imageViews;
+        std::unique_ptr<RG::Image>                    image;
+        std::vector<std::unique_ptr<RG::ImageView2D>> imageViews;
 
-        SingleImageResource (const GVK::DeviceExtra& device, uint32_t width, uint32_t height, uint32_t arrayLayers, VkFormat format = FormatRGBA, VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL);
+        SingleImageResource (const RG::DeviceExtra& device, uint32_t width, uint32_t height, uint32_t arrayLayers, VkFormat format = FormatRGBA, VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL);
     };
 
 public:
@@ -119,7 +119,7 @@ public:
     VkImageLayout finalLayout;   // TODO temporary
 
     std::vector<std::unique_ptr<SingleImageResource>> images;
-    std::unique_ptr<GVK::Sampler>                     sampler;
+    std::unique_ptr<RG::Sampler>                     sampler;
 
 public:
     WritableImageResource (VkFilter filter, uint32_t width, uint32_t height, uint32_t arrayLayers, VkFormat format = SingleImageResource::FormatRGBA);
@@ -138,9 +138,9 @@ public:
     virtual VkFormat GetFormat () const override;
     virtual uint32_t GetLayerCount () const override;
 
-    virtual std::vector<GVK::Image*> GetImages () const override;
+    virtual std::vector<RG::Image*> GetImages () const override;
 
-    virtual std::vector<GVK::Image*> GetImages (uint32_t resourceIndex) const override;
+    virtual std::vector<RG::Image*> GetImages (uint32_t resourceIndex) const override;
 
     // overriding DescriptorBindableImage
     virtual VkImageView GetImageViewForFrame (uint32_t resourceIndex, uint32_t layerIndex) override;
@@ -157,11 +157,11 @@ public:
 
     virtual void Compile (const GraphSettings& graphSettings) override;
 
-    virtual void OnPreRead (uint32_t resourceIndex, GVK::CommandBuffer& commandBuffer) override;
+    virtual void OnPreRead (uint32_t resourceIndex, RG::CommandBuffer& commandBuffer) override;
 
-    virtual void OnPreWrite (uint32_t resourceIndex, GVK::CommandBuffer& commandBuffer) override;
+    virtual void OnPreWrite (uint32_t resourceIndex, RG::CommandBuffer& commandBuffer) override;
 
-    virtual void OnPostWrite (uint32_t resourceIndex, GVK::CommandBuffer& commandBuffer) override;
+    virtual void OnPostWrite (uint32_t resourceIndex, RG::CommandBuffer& commandBuffer) override;
 };
 
 
@@ -169,7 +169,7 @@ class RENDERGRAPH_DLL_EXPORT GPUBufferResource : public DescriptorBindableBuffer
 public:
     size_t size;
     
-    std::vector<std::unique_ptr<GVK::BufferTransferable>> buffers;
+    std::vector<std::unique_ptr<RG::BufferTransferable>> buffers;
 
 public:
     GPUBufferResource (size_t size);
@@ -193,9 +193,9 @@ public:
 
 class RENDERGRAPH_DLL_EXPORT ReadOnlyImageResource : public OneTimeCompileResource, public DescriptorBindableImage {
 public:
-    std::unique_ptr<GVK::ImageTransferable> image;
-    std::unique_ptr<GVK::ImageViewBase>     imageView;
-    std::unique_ptr<GVK::Sampler>           sampler;
+    std::unique_ptr<RG::ImageTransferable> image;
+    std::unique_ptr<RG::ImageViewBase>     imageView;
+    std::unique_ptr<RG::Sampler>           sampler;
 
     const VkFormat format;
     const VkFilter filter;
@@ -220,9 +220,9 @@ public:
     virtual VkFormat      GetFormat () const override;
     virtual uint32_t      GetLayerCount () const override;
 
-    virtual std::vector<GVK::Image*> GetImages () const override;
+    virtual std::vector<RG::Image*> GetImages () const override;
 
-    virtual std::vector<GVK::Image*> GetImages (uint32_t) const override;
+    virtual std::vector<RG::Image*> GetImages (uint32_t) const override;
 
     // overriding DescriptorBindableImage
     virtual VkImageView GetImageViewForFrame (uint32_t, uint32_t) override;
@@ -244,12 +244,12 @@ public:
 
 class RENDERGRAPH_DLL_EXPORT SwapchainImageResource : public ImageResource, public DescriptorBindableImage {
 public:
-    std::vector<std::unique_ptr<GVK::ImageView2D>>    imageViews;
-    GVK::SwapchainProvider&                           swapchainProv;
-    std::vector<std::unique_ptr<GVK::InheritedImage>> inheritedImages;
+    std::vector<std::unique_ptr<RG::ImageView2D>>    imageViews;
+    RG::SwapchainProvider&                           swapchainProv;
+    std::vector<std::unique_ptr<RG::InheritedImage>> inheritedImages;
 
 public:
-    SwapchainImageResource (GVK::SwapchainProvider& swapchainProv);
+    SwapchainImageResource (RG::SwapchainProvider& swapchainProv);
 
     virtual ~SwapchainImageResource ();
 
@@ -262,9 +262,9 @@ public:
     virtual VkFormat      GetFormat () const override;
     virtual uint32_t      GetLayerCount () const override;
 
-    virtual std::vector<GVK::Image*> GetImages () const override;
+    virtual std::vector<RG::Image*> GetImages () const override;
 
-    virtual std::vector<GVK::Image*> GetImages (uint32_t resourceIndex) const override;
+    virtual std::vector<RG::Image*> GetImages (uint32_t resourceIndex) const override;
 
     // overriding DescriptorBindableImage
     virtual VkImageView GetImageViewForFrame (uint32_t resourceIndex, uint32_t) override;
@@ -275,8 +275,8 @@ public:
 class RENDERGRAPH_DLL_EXPORT CPUBufferResource : public DescriptorBindableBufferResource {
 public:
     const uint32_t                                   size;
-    std::vector<std::unique_ptr<GVK::Buffer>>        buffers;
-    std::vector<std::unique_ptr<GVK::MemoryMapping>> mappings;
+    std::vector<std::unique_ptr<RG::Buffer>>        buffers;
+    std::vector<std::unique_ptr<RG::MemoryMapping>> mappings;
 
 public:
     CPUBufferResource (uint32_t size);
@@ -291,7 +291,7 @@ public:
     virtual VkBuffer GetBufferForFrame (uint32_t resourceIndex) override;
     virtual size_t GetBufferSize () override;
 
-    GVK::MemoryMapping& GetMapping (uint32_t resourceIndex);
+    RG::MemoryMapping& GetMapping (uint32_t resourceIndex);
 };
 
 

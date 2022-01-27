@@ -7,7 +7,7 @@
 #include "RenderGraph/Utils/Noncopyable.hpp"
 #include "VulkanObject.hpp"
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ DescriptorPool : public VulkanObject {
 private:
@@ -19,7 +19,7 @@ public:
         : device (device)
         , handle (VK_NULL_HANDLE)
     {
-        if (GVK_ERROR (poolSizes.empty ())) {
+        if (RG_ERROR (poolSizes.empty ())) {
             throw std::runtime_error ("empty pool");
         }
 
@@ -29,7 +29,7 @@ public:
         poolInfo.pPoolSizes                 = poolSizes.data ();
         poolInfo.maxSets                    = maxSets;
 
-        if (GVK_ERROR (vkCreateDescriptorPool (device, &poolInfo, nullptr, &handle) != VK_SUCCESS)) {
+        if (RG_ERROR (vkCreateDescriptorPool (device, &poolInfo, nullptr, &handle) != VK_SUCCESS)) {
             throw std::runtime_error ("failed to create descriptor pool");
         }
     }
@@ -53,6 +53,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -11,7 +11,7 @@ namespace FromShaderReflection {
 IAttachmentProvider::~IAttachmentProvider () = default;
 
 
-std::optional<AttachmentDataTable::AttachmentData> AttachmentDataTable::GetAttachmentData (const std::string& name, GVK::ShaderKind shaderKind)
+std::optional<AttachmentDataTable::AttachmentData> AttachmentDataTable::GetAttachmentData (const std::string& name, RG::ShaderKind shaderKind)
 {
     for (const auto& entry : table) {
         if (entry.name == name && entry.shaderKind == shaderKind) {
@@ -23,14 +23,14 @@ std::optional<AttachmentDataTable::AttachmentData> AttachmentDataTable::GetAttac
 }
 
 
-std::vector<VkImageView> GetImageViews (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, uint32_t resourceIndex, IAttachmentProvider& attachmentProvider)
+std::vector<VkImageView> GetImageViews (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, uint32_t resourceIndex, IAttachmentProvider& attachmentProvider)
 {
     std::vector<VkImageView> imageViews;
 
-    for (const SR::Output& output : reflection.outputs) {
+    for (const RG::Refl::Output& output : reflection.outputs) {
         const std::optional<IAttachmentProvider::AttachmentData> attachmentData = attachmentProvider.GetAttachmentData (output.name, shaderKind);
 
-        if (GVK_ERROR (!attachmentData.has_value ())) {
+        if (RG_ERROR (!attachmentData.has_value ())) {
             spdlog::error ("Attachment \"{}\" (location: {}, layerCount: {}) is not set.", output.name, output.location, output.arraySize);
             continue;
         }
@@ -42,10 +42,10 @@ std::vector<VkImageView> GetImageViews (const GVK::ShaderModuleReflection& refle
         }
     }
 
-    for (const SR::SubpassInput& subpassInput : reflection.subpassInputs) {
+    for (const RG::Refl::SubpassInput& subpassInput : reflection.subpassInputs) {
         const std::optional<IAttachmentProvider::AttachmentData> attachmentData = attachmentProvider.GetAttachmentData (subpassInput.name, shaderKind);
 
-        if (GVK_ERROR (!attachmentData.has_value ())) {
+        if (RG_ERROR (!attachmentData.has_value ())) {
             spdlog::error ("Attachment \"{}\" (binding: {}, layerCount: {}) is not set.", subpassInput.name, subpassInput.binding, subpassInput.arraySize);
             continue;
         }
@@ -61,14 +61,14 @@ std::vector<VkImageView> GetImageViews (const GVK::ShaderModuleReflection& refle
 }
 
 
-std::vector<VkAttachmentReference> GetAttachmentReferences (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider)
+std::vector<VkAttachmentReference> GetAttachmentReferences (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider)
 {
     std::vector<VkAttachmentReference> result;
 
-    for (const SR::Output& output : reflection.outputs) {
+    for (const RG::Refl::Output& output : reflection.outputs) {
         const std::optional<IAttachmentProvider::AttachmentData> attachmentData = attachmentProvider.GetAttachmentData (output.name, shaderKind);
 
-        if (GVK_ERROR (!attachmentData.has_value ())) {
+        if (RG_ERROR (!attachmentData.has_value ())) {
             spdlog::error ("Attachment \"{}\" (location: {}, layerCount: {}) is not set.", output.name, output.location, output.arraySize);
             continue;
         }
@@ -88,14 +88,14 @@ std::vector<VkAttachmentReference> GetAttachmentReferences (const GVK::ShaderMod
 }
 
 
-std::vector<VkAttachmentReference> GetInputAttachmentReferences (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider, uint32_t startIndex)
+std::vector<VkAttachmentReference> GetInputAttachmentReferences (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider, uint32_t startIndex)
 {
     std::vector<VkAttachmentReference> result;
 
-    for (const SR::SubpassInput& subpassInput : reflection.subpassInputs) {
+    for (const RG::Refl::SubpassInput& subpassInput : reflection.subpassInputs) {
         const std::optional<IAttachmentProvider::AttachmentData> attachmentData = attachmentProvider.GetAttachmentData (subpassInput.name, shaderKind);
 
-        if (GVK_ERROR (!attachmentData.has_value ())) {
+        if (RG_ERROR (!attachmentData.has_value ())) {
             spdlog::error ("Input attachment \"{}\" (binding: {}, layerCount: {}) is not set.", subpassInput.name, subpassInput.binding, subpassInput.arraySize);
             continue;
         }
@@ -115,14 +115,14 @@ std::vector<VkAttachmentReference> GetInputAttachmentReferences (const GVK::Shad
 }
 
 
-std::vector<VkAttachmentDescription> GetAttachmentDescriptions (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider)
+std::vector<VkAttachmentDescription> GetAttachmentDescriptions (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider)
 {
     std::vector<VkAttachmentDescription> result;
 
-    for (const SR::Output& output : reflection.outputs) {
+    for (const RG::Refl::Output& output : reflection.outputs) {
         const std::optional<IAttachmentProvider::AttachmentData> attachmentData = attachmentProvider.GetAttachmentData (output.name, shaderKind);
 
-        if (GVK_ERROR (!attachmentData.has_value ())) {
+        if (RG_ERROR (!attachmentData.has_value ())) {
             spdlog::error ("Attachment \"{}\" (location: {}, layerCount: {}) is not set.", output.name, output.location, output.arraySize);
             continue;
         }
@@ -145,10 +145,10 @@ std::vector<VkAttachmentDescription> GetAttachmentDescriptions (const GVK::Shade
         }
     }
 
-    for (const SR::SubpassInput& subpassInput : reflection.subpassInputs) {
+    for (const RG::Refl::SubpassInput& subpassInput : reflection.subpassInputs) {
         const std::optional<IAttachmentProvider::AttachmentData> attachmentData = attachmentProvider.GetAttachmentData (subpassInput.name, shaderKind);
 
-        if (GVK_ERROR (!attachmentData.has_value ())) {
+        if (RG_ERROR (!attachmentData.has_value ())) {
             spdlog::error ("Attachment \"{}\" (binding: {}, layerCount: {}) is not set.", subpassInput.name, subpassInput.binding, subpassInput.arraySize);
             continue;
         }

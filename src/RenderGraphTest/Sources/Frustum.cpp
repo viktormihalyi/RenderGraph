@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #pragma warning(pop)
 
-namespace GVK {
+namespace RG {
 
 PerspectiveFrustum::PerspectiveFrustum (float backPlane, float frontPlane, float fov, float aspectRatio)
     : backPlane (backPlane)
@@ -37,4 +37,4 @@ glm::mat4 OrthographicFrustum::GetMatrix () const
     return glm::ortho (left, right, bottom, top);
 }
 
-} // namespace GVK
+} // namespace RG

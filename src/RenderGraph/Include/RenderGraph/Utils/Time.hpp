@@ -5,7 +5,7 @@
 
 #include <chrono>
 
-namespace GVK {
+namespace RG {
 
 class TimePoint {
 public:
@@ -59,6 +59,6 @@ public:
 
 using TimeDelta = TimePoint;
 
-} // namespace GVK
+} // namespace RG
 
 #endif

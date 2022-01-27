@@ -13,7 +13,7 @@ Event::Event (VkDevice device)
     createInfo.pNext             = nullptr;
     createInfo.flags             = 0;
 
-    if (GVK_ERROR (vkCreateEvent (device, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateEvent (device, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create vkevent");
     }
 }

@@ -10,11 +10,11 @@
 
 #include <stdexcept>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT Allocator : public VulkanObject {
 private:
-    GVK::MovablePtr<VmaAllocator> handle;
+    RG::MovablePtr<VmaAllocator> handle;
 
 public:
     Allocator (VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device);
@@ -30,6 +30,6 @@ public:
     operator VmaAllocator () const { return handle; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

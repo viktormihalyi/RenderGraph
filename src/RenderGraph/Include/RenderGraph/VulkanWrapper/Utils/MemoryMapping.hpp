@@ -16,22 +16,22 @@
 #include <cstring>
 #include <vector>
 
-namespace GVK {
+namespace RG {
 
 class DeviceMemory;
 
 class RENDERGRAPH_DLL_EXPORT MemoryMapping {
 private:
-    GVK::MovablePtr<VkDevice>       device;
-    GVK::MovablePtr<VkDeviceMemory> memory;
+    RG::MovablePtr<VkDevice>       device;
+    RG::MovablePtr<VkDeviceMemory> memory;
 
-    GVK::MovablePtr<VmaAllocator>  allocator;
-    GVK::MovablePtr<VmaAllocation> allocationHandle;
+    RG::MovablePtr<VmaAllocator>  allocator;
+    RG::MovablePtr<VmaAllocation> allocationHandle;
 
     size_t offset;
     size_t size;
 
-    GVK::MovablePtr<void*> mappedMemory;
+    RG::MovablePtr<void*> mappedMemory;
 
 public:
     MemoryMapping (VkDevice device, VkDeviceMemory memory, size_t offset, size_t size);
@@ -43,7 +43,7 @@ public:
     template<typename T>
     void Copy (const std::vector<T>& obj) const
     {
-        GVK_ASSERT (sizeof (T) * obj.size () == size);
+        RG_ASSERT (sizeof (T) * obj.size () == size);
         memcpy (mappedMemory, obj.data (), sizeof (T) * obj.size ());
     }
 
@@ -51,7 +51,7 @@ public:
     void Copy (const T& obj) const
     {
         const size_t copiedObjSize = sizeof (T);
-        GVK_ASSERT (copiedObjSize <= size);
+        RG_ASSERT (copiedObjSize <= size);
         memcpy (mappedMemory, &obj, size);
     }
 
@@ -62,6 +62,6 @@ public:
     size_t GetOffset () const { return offset; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

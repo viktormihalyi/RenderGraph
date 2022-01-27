@@ -26,14 +26,14 @@ public:
         VkImageLayout                                   finalLayout;
     };
 
-    virtual std::optional<AttachmentData> GetAttachmentData (const std::string& name, GVK::ShaderKind shaderKind) = 0;
+    virtual std::optional<AttachmentData> GetAttachmentData (const std::string& name, RG::ShaderKind shaderKind) = 0;
 };
 
 class RENDERGRAPH_DLL_EXPORT AttachmentDataTable : public IAttachmentProvider {
 public:
     struct AttachmentDataEntry {
         std::string     name;
-        GVK::ShaderKind shaderKind;
+        RG::ShaderKind shaderKind;
         AttachmentData  data;
     };
 
@@ -41,24 +41,24 @@ public:
 
     virtual ~AttachmentDataTable () override = default;
 
-    virtual std::optional<AttachmentData> GetAttachmentData (const std::string& name, GVK::ShaderKind shaderKind) override;
+    virtual std::optional<AttachmentData> GetAttachmentData (const std::string& name, RG::ShaderKind shaderKind) override;
 };
 
 
 RENDERGRAPH_DLL_EXPORT
-std::vector<VkImageView> GetImageViews (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, uint32_t resourceIndex, IAttachmentProvider& attachmentProvider);
+std::vector<VkImageView> GetImageViews (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, uint32_t resourceIndex, IAttachmentProvider& attachmentProvider);
 
 
 RENDERGRAPH_DLL_EXPORT
-std::vector<VkAttachmentReference> GetAttachmentReferences (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider);
+std::vector<VkAttachmentReference> GetAttachmentReferences (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider);
 
 
 RENDERGRAPH_DLL_EXPORT
-std::vector<VkAttachmentReference> GetInputAttachmentReferences (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider, uint32_t startIndex);
+std::vector<VkAttachmentReference> GetInputAttachmentReferences (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider, uint32_t startIndex);
 
 
 RENDERGRAPH_DLL_EXPORT
-std::vector<VkAttachmentDescription> GetAttachmentDescriptions (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider);
+std::vector<VkAttachmentDescription> GetAttachmentDescriptions (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind, IAttachmentProvider& attachmentProvider);
 
 
 } // namespace FromShaderReflection

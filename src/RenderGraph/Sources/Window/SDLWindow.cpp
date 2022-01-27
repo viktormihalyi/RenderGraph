@@ -21,11 +21,11 @@ SDLWindowBase::SDLWindowBase (uint32_t flags)
     , fullscreenHeight (1080)
     , isFullscreen (false)
 {
-    if (GVK_ERROR (windowCount != 0)) {
+    if (RG_ERROR (windowCount != 0)) {
         throw std::runtime_error ("TODO support multiple windows");
     }
 
-    if (GVK_ERROR (SDL_Init (SDL_INIT_VIDEO) != 0)) {
+    if (RG_ERROR (SDL_Init (SDL_INIT_VIDEO) != 0)) {
         throw std::runtime_error ("sdl init failed");
     }
 
@@ -53,7 +53,7 @@ void* SDLWindowBase::GetHandle () const
 
 void SDLWindowBase::DoEventLoop (const DrawCallback& drawCallback)
 {
-    GVK_ASSERT (window != nullptr);
+    RG_ASSERT (window != nullptr);
 
     bool      quit = false;
     SDL_Event e;
@@ -127,15 +127,15 @@ void SDLWindowBase::DoEventLoop (const DrawCallback& drawCallback)
 
 std::vector<const char*> SDLWindowBase::GetExtensions () const
 {
-    GVK_ASSERT (window != nullptr);
+    RG_ASSERT (window != nullptr);
 
     unsigned int count;
-    if (GVK_ERROR (!SDL_Vulkan_GetInstanceExtensions (reinterpret_cast<SDL_Window*> (window), &count, nullptr))) {
+    if (RG_ERROR (!SDL_Vulkan_GetInstanceExtensions (reinterpret_cast<SDL_Window*> (window), &count, nullptr))) {
         throw std::runtime_error ("sdl failed to get instance extensions");
     }
 
     std::vector<const char*> extensions (count);
-    if (GVK_ERROR (!SDL_Vulkan_GetInstanceExtensions (reinterpret_cast<SDL_Window*> (window), &count, extensions.data ()))) {
+    if (RG_ERROR (!SDL_Vulkan_GetInstanceExtensions (reinterpret_cast<SDL_Window*> (window), &count, extensions.data ()))) {
         throw std::runtime_error ("sdl failed to get instance extensions");
     }
 
@@ -145,7 +145,7 @@ std::vector<const char*> SDLWindowBase::GetExtensions () const
 
 VkSurfaceKHR SDLWindowBase::GetSurface (VkInstance instance) const
 {
-    GVK_ASSERT (window != nullptr);
+    RG_ASSERT (window != nullptr);
 
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     if (!SDL_Vulkan_CreateSurface (reinterpret_cast<SDL_Window*> (window), instance, &surface)) {

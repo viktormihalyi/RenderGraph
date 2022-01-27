@@ -13,7 +13,7 @@
 #include "spdlog/spdlog.h"
 
 
-namespace Utils {
+namespace RG {
 
 namespace detail {
 
@@ -105,4 +105,4 @@ void LogDebugBreakFunc (const char* dialogTitle, const char* conditionString, co
 
 } // namespace detail
 
-} // namespace Utils
+} // namespace RG

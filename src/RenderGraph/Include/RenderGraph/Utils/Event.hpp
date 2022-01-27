@@ -28,7 +28,7 @@
 //      SingleEventObserver can only subsribe to only one Event at a time.
 //      EventObserver can subscribe to multiple events. one EventObserver can only observe an Event once.
 
-namespace GVK {
+namespace RG {
 
 template<typename... ARGS>
 class Event;
@@ -125,7 +125,7 @@ public:
     void Notify (ARGS... args) const
     {
         for (auto& obv : evObservers) {
-            GVK_ASSERT (obv != nullptr);
+            RG_ASSERT (obv != nullptr);
             obv->Notify (std::forward<ARGS> (args)...);
         }
     }
@@ -140,7 +140,7 @@ public:
 template<typename... ARGS>
 void EventObserverScopeTyped<ARGS...>::Connect (Event<ARGS...>& ev)
 {
-    if (GVK_ERROR (connectedEvent != nullptr)) {
+    if (RG_ERROR (connectedEvent != nullptr)) {
         // must disconnect first
         return;
     }
@@ -180,7 +180,7 @@ public:
     void Observe (Event<ARGS...>& ev, Observer observer)
     {
         auto it = std::find (observedEvents.begin (), observedEvents.end (), &ev);
-        if (GVK_ERROR (it != observedEvents.end ())) {
+        if (RG_ERROR (it != observedEvents.end ())) {
             // event already observed
             return;
         }
@@ -194,7 +194,7 @@ public:
     void Disconnect (IEvent& ev)
     {
         auto it = std::find (observedEvents.begin (), observedEvents.end (), &ev);
-        if (GVK_ERROR (it == observedEvents.end ())) {
+        if (RG_ERROR (it == observedEvents.end ())) {
             // event not observed
             return;
         }
@@ -223,7 +223,7 @@ public:
     template<typename... ARGS, typename Observer>
     void Observe (Event<ARGS...>& ev, Observer observerCallback)
     {
-        if (GVK_ERROR (observedEvent != nullptr)) {
+        if (RG_ERROR (observedEvent != nullptr)) {
             return;
         }
 
@@ -235,7 +235,7 @@ public:
 
     void Disconnect ()
     {
-        if (GVK_ERROR (observedEvent == nullptr)) {
+        if (RG_ERROR (observedEvent == nullptr)) {
             return;
         }
 
@@ -244,6 +244,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

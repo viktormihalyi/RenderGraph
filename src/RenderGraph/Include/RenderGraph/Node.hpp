@@ -11,14 +11,14 @@ namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT Node : public Noncopyable {
 private:
-    GVK::UUID   uuid;
+    RG::UUID   uuid;
     std::string name;
     std::string debugInfo;
 
 public:
     virtual ~Node () = default;
 
-    const GVK::UUID& GetUUID () const { return uuid; }
+    const RG::UUID& GetUUID () const { return uuid; }
 
     void SetName (const std::string& value) { name = value; }
     void SetDebugInfo (const std::string& value) { debugInfo = value; }

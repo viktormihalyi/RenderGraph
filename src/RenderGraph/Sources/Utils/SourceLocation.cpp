@@ -2,6 +2,6 @@
 
 #include <sstream>
 
-namespace Utils {
+namespace RG {
 
-} // namespace Utils
+} // namespace RG

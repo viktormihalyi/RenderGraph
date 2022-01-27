@@ -14,7 +14,7 @@
 #include <vector>
 
 
-namespace Utils {
+namespace RG {
 
 RENDERGRAPH_DLL_EXPORT
 std::vector<std::string> SplitString (const std::string& str, const char delim, const bool keepEmpty = false);
@@ -78,6 +78,6 @@ void ForEach (Container&& container, Processor&& processor)
 }
 
 
-} // namespace Utils
+} // namespace RG
 
 #endif

@@ -112,21 +112,21 @@ public:
 class RENDERGRAPH_DLL_EXPORT GraphSettings {
 public:
     ConnectionSet           connectionSet;
-    const GVK::DeviceExtra* device;
+    const RG::DeviceExtra* device;
     uint32_t                framesInFlight;
 
-    GraphSettings (const GVK::DeviceExtra& device, ConnectionSet&& connectionSet, uint32_t framesInFlight);
-    GraphSettings (const GVK::DeviceExtra& device, uint32_t framesInFlight);
+    GraphSettings (const RG::DeviceExtra& device, ConnectionSet&& connectionSet, uint32_t framesInFlight);
+    GraphSettings (const RG::DeviceExtra& device, uint32_t framesInFlight);
 
     GraphSettings ();
     GraphSettings (GraphSettings&&) noexcept;
     GraphSettings& operator= (GraphSettings&&) noexcept;
 
-    const GVK::DeviceExtra& GetDevice () const;
+    const RG::DeviceExtra& GetDevice () const;
 
-    const GVK::Queue& GetGrahpicsQueue () const;
+    const RG::Queue& GetGrahpicsQueue () const;
 
-    const GVK::CommandPool& GetCommandPool () const;
+    const RG::CommandPool& GetCommandPool () const;
 };
 
 } // namespace RG

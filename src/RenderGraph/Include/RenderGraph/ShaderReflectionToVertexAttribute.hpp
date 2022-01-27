@@ -16,10 +16,10 @@ namespace RG {
 namespace FromShaderReflection {
 
 RENDERGRAPH_DLL_EXPORT
-std::vector<VkVertexInputAttributeDescription> GetVertexAttributes (const GVK::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& instanceNameProvider);
+std::vector<VkVertexInputAttributeDescription> GetVertexAttributes (const RG::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& instanceNameProvider);
 
 RENDERGRAPH_DLL_EXPORT
-std::vector<VkVertexInputBindingDescription> GetVertexBindings (const GVK::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& instanceNameProvider);
+std::vector<VkVertexInputBindingDescription> GetVertexBindings (const RG::ShaderModuleReflection& reflection, const std::function<bool (const std::string&)>& instanceNameProvider);
 
 } // namespace FromShaderReflection
 } // namespace RG

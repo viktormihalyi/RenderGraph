@@ -8,7 +8,7 @@
 
 #include "RenderGraph/RenderGraphExport.hpp"
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT UUID {
 private:
@@ -26,12 +26,12 @@ public:
     friend struct std::hash<UUID>;
 };
 
-} // namespace GVK
+} // namespace RG
 
 
 template<>
-struct RENDERGRAPH_DLL_EXPORT std::hash<GVK::UUID> {
-    std::size_t operator() (const GVK::UUID& uuid) const noexcept
+struct RENDERGRAPH_DLL_EXPORT std::hash<RG::UUID> {
+    std::size_t operator() (const RG::UUID& uuid) const noexcept
     {
         const uint64_t firstHalf  = *reinterpret_cast<const uint64_t*> (uuid.data.data ());
         const uint64_t secondHalf = *reinterpret_cast<const uint64_t*> (uuid.data.data () + 8);

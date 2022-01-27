@@ -9,7 +9,7 @@
 #include <vulkan/vulkan.h>
 #include <vector>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT Device : public Nonmovable {
 public:
@@ -28,7 +28,7 @@ public:
 class RENDERGRAPH_DLL_EXPORT DeviceObject : public VulkanObject, public Device {
 private:
     VkPhysicalDevice          physicalDevice;
-    GVK::MovablePtr<VkDevice> handle;
+    RG::MovablePtr<VkDevice> handle;
 
 public:
     DeviceObject (VkPhysicalDevice physicalDevice, std::vector<uint32_t> queueFamilyIndices, std::vector<const char*> requestedDeviceExtensions);
@@ -53,6 +53,6 @@ private:
     uint32_t FindMemoryType (uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -12,7 +12,7 @@ namespace RG {
 ConnectionSet::~ConnectionSet () = default;
 
 
-GraphSettings::GraphSettings (const GVK::DeviceExtra& device, ConnectionSet&& connectionSet, uint32_t framesInFlight)
+GraphSettings::GraphSettings (const RG::DeviceExtra& device, ConnectionSet&& connectionSet, uint32_t framesInFlight)
     : device (&device)
     , framesInFlight (framesInFlight)
     , connectionSet (std::move (connectionSet))
@@ -20,7 +20,7 @@ GraphSettings::GraphSettings (const GVK::DeviceExtra& device, ConnectionSet&& co
 }
 
 
-GraphSettings::GraphSettings (const GVK::DeviceExtra& device, uint32_t framesInFlight)
+GraphSettings::GraphSettings (const RG::DeviceExtra& device, uint32_t framesInFlight)
     : device (&device)
     , framesInFlight (framesInFlight)
 {
@@ -33,20 +33,20 @@ GraphSettings::GraphSettings ()
 {
 }
 
-const GVK::DeviceExtra& GraphSettings::GetDevice () const
+const RG::DeviceExtra& GraphSettings::GetDevice () const
 {
-    GVK_ASSERT (device != nullptr);
+    RG_ASSERT (device != nullptr);
     return *device;
 }
 
 
-const GVK::Queue& GraphSettings::GetGrahpicsQueue () const
+const RG::Queue& GraphSettings::GetGrahpicsQueue () const
 {
     return device->GetGraphicsQueue ();
 }
 
 
-const GVK::CommandPool& GraphSettings::GetCommandPool () const
+const RG::CommandPool& GraphSettings::GetCommandPool () const
 {
     return device->GetCommandPool ();
 }
@@ -115,7 +115,7 @@ std::shared_ptr<Node> ConnectionSet::GetNodeByName (std::string_view name) const
             if (node->GetName ().empty ())
                 continue;
 
-            GVK_ASSERT (nameSet.count (node->GetName ()) == 0);
+            RG_ASSERT (nameSet.count (node->GetName ()) == 0);
             nameSet.insert (node->GetName ());
         }
     }

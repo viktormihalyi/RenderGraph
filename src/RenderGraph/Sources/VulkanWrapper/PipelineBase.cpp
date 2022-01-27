@@ -1,7 +1,7 @@
 #include "PipelineBase.hpp"
 
-namespace GVK {
+namespace RG {
 
 PipelineBase::~PipelineBase () = default;
 
-} // namespace GVK
+} // namespace RG

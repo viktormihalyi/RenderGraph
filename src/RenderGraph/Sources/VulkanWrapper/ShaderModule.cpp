@@ -20,10 +20,10 @@
 #include "spdlog/spdlog.h"
 
 #if 0
-static Utils::CommandLineOnOffFlag disableShaderCacheFlag ("--disableShaderCache");
+static RG::CommandLineOnOffFlag disableShaderCacheFlag ("--disableShaderCache");
 #endif
 
-namespace GVK {
+namespace RG {
 
     
 ShaderCompileException::ShaderCompileException (const std::string& errorMessage)
@@ -216,8 +216,8 @@ public:
             return std::nullopt;
         }
 
-        const std::optional<std::string> actualCode = Utils::ReadTextFile (tempFolder / cachedCodeFileName);
-        if (GVK_ERROR (!actualCode)) {
+        const std::optional<std::string> actualCode = RG::ReadTextFile (tempFolder / cachedCodeFileName);
+        if (RG_ERROR (!actualCode)) {
             return std::nullopt;
         }
 
@@ -229,8 +229,8 @@ public:
             return std::nullopt;
         }
 
-        std::optional<std::vector<char>> binaryC = Utils::ReadBinaryFile (tempFolder / cachedBinaryFileName);
-        if (GVK_ERROR (!binaryC.has_value ())) {
+        std::optional<std::vector<char>> binaryC = RG::ReadBinaryFile (tempFolder / cachedBinaryFileName);
+        if (RG_ERROR (!binaryC.has_value ())) {
             return std::nullopt;
         }
 
@@ -256,8 +256,8 @@ public:
             return false;
         }
 
-        GVK_VERIFY (Utils::WriteTextFile (tempFolder / cachedCodeFileName, sourceCode));
-        GVK_VERIFY (Utils::WriteBinaryFile (tempFolder / cachedBinaryFileName, binary.data (), binary.size () * sizeof (uint32_t)));
+        RG_VERIFY (RG::WriteTextFile (tempFolder / cachedCodeFileName, sourceCode));
+        RG_VERIFY (RG::WriteBinaryFile (tempFolder / cachedBinaryFileName, binary.data (), binary.size () * sizeof (uint32_t)));
 
         return true;
     }
@@ -341,7 +341,7 @@ struct CompileParameters {
 
 
 // TODO ennek nem kene itt lennie
-extern Utils::CommandLineOnOffFlag enableShaderPrintfFlag;
+extern RG::CommandLineOnOffFlag enableShaderPrintfFlag;
 
 
 static std::vector<uint32_t> CompileWithGlslangCppInterface (CompileParameters params)
@@ -355,10 +355,10 @@ static std::vector<uint32_t> CompileWithGlslangCppInterface (CompileParameters p
     if (enableShaderPrintfFlag.IsFlagOn ())
         params.defines.push_back ("SHADERPRINTF");
 
-    if (GVK_ERROR (params.sourceCode.empty ()))
+    if (RG_ERROR (params.sourceCode.empty ()))
         throw ShaderCompileException ("No shader source provided.");
 
-    if (GVK_ERROR (!params.shaderKindDescriptor.has_value ()))
+    if (RG_ERROR (!params.shaderKindDescriptor.has_value ()))
         throw ShaderCompileException ("No shader kind provided.");
 
     const char* const                       sourceCstr                  = params.sourceCode.c_str ();
@@ -417,7 +417,7 @@ static std::vector<uint32_t> CompileWithGlslangCppInterface (CompileParameters p
     glslang::GlslangToSpv (*program.getIntermediate (params.shaderKindDescriptor->esh), spirvBinary, &logger, &spvOptions);
 
     const std::string loggerMessages = logger.getAllMessages ();
-    if (GVK_ERROR (!loggerMessages.empty ()))
+    if (RG_ERROR (!loggerMessages.empty ()))
         spdlog::error ("{}", loggerMessages);
 
     return spirvBinary;
@@ -456,7 +456,7 @@ static VkShaderModule CreateShaderModuleImpl (VkDevice device, const std::vector
     createInfo.pCode                    = reinterpret_cast<const uint32_t*> (binary.data ());
 
     VkShaderModule result = VK_NULL_HANDLE;
-    if (GVK_ERROR (vkCreateShaderModule (device, &createInfo, nullptr, &result) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateShaderModule (device, &createInfo, nullptr, &result) != VK_SUCCESS)) {
         spdlog::critical ("VkShaderModule creation failed.");
         throw std::runtime_error ("failed to create shader module");
     }
@@ -473,7 +473,7 @@ static VkShaderModule CreateShaderModuleImpl (VkDevice device, const std::vector
     createInfo.pCode                    = reinterpret_cast<const uint32_t*> (binary.data ());
 
     VkShaderModule result = VK_NULL_HANDLE;
-    if (GVK_ERROR (vkCreateShaderModule (device, &createInfo, nullptr, &result) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateShaderModule (device, &createInfo, nullptr, &result) != VK_SUCCESS)) {
         spdlog::critical ("VkShaderModule creation failed.");
         throw std::runtime_error ("failed to create shader module");
     }
@@ -508,8 +508,8 @@ ShaderModule::ShaderModule (ShaderKind                      shaderKind,
 
 std::unique_ptr<ShaderModule> ShaderModule::CreateFromSPVFile (VkDevice device, ShaderKind shaderKind, const std::filesystem::path& fileLocation, const std::vector<std::string>& defines, const std::vector<std::string>& undefines)
 {
-    std::optional<std::vector<char>> binaryC = Utils::ReadBinaryFile (fileLocation);
-    if (GVK_ERROR (!binaryC.has_value ())) {
+    std::optional<std::vector<char>> binaryC = RG::ReadBinaryFile (fileLocation);
+    if (RG_ERROR (!binaryC.has_value ())) {
         throw std::runtime_error ("failed to read shader");
     }
 
@@ -525,13 +525,13 @@ std::unique_ptr<ShaderModule> ShaderModule::CreateFromSPVFile (VkDevice device, 
 
 std::unique_ptr<ShaderModule> ShaderModule::CreateFromGLSLFile (VkDevice device, const std::filesystem::path& fileLocation, const std::vector<std::string>& defines, const std::vector<std::string>& undefines)
 {
-    std::optional<std::string> fileContents = Utils::ReadTextFile (fileLocation);
-    if (GVK_ERROR (!fileContents.has_value ())) {
+    std::optional<std::string> fileContents = RG::ReadTextFile (fileLocation);
+    if (RG_ERROR (!fileContents.has_value ())) {
         throw std::runtime_error ("Failed to read file.");
     }
 
     std::optional<ShaderKindDescriptor> shaderKindDescriptor = ShaderKindDescriptor::FromExtension (fileLocation.extension ().string ());
-    if (GVK_ERROR (!shaderKindDescriptor.has_value ())) {
+    if (RG_ERROR (!shaderKindDescriptor.has_value ())) {
         throw std::runtime_error ("Unknown shader file extension.");
     }
 
@@ -542,7 +542,7 @@ std::unique_ptr<ShaderModule> ShaderModule::CreateFromGLSLFile (VkDevice device,
     parameters.undefines            = {};
 
     std::optional<std::vector<uint32_t>> binary = CompileFromSourceCode (parameters);
-    if (GVK_ERROR (!binary.has_value ())) {
+    if (RG_ERROR (!binary.has_value ())) {
         throw std::runtime_error ("failed to compile shader");
     }
 
@@ -564,7 +564,7 @@ std::unique_ptr<ShaderModule> ShaderModule::CreateFromGLSLFile (VkDevice device,
 std::unique_ptr<ShaderModule> ShaderModule::CreateFromGLSLString (VkDevice device, ShaderKind shaderKind, const std::string& shaderSource, const std::vector<std::string>& defines, const std::vector<std::string>& undefines)
 {
     std::optional<ShaderKindDescriptor> shaderKindDescriptor = ShaderKindDescriptor::FromShaderKind (shaderKind);
-    if (GVK_ERROR (!shaderKindDescriptor.has_value ())) {
+    if (RG_ERROR (!shaderKindDescriptor.has_value ())) {
         throw std::runtime_error ("Unknown shaderkind.");
     }
 
@@ -614,14 +614,14 @@ VkPipelineShaderStageCreateInfo ShaderModule::GetShaderStageCreateInfo () const
 
 ShaderModuleReflection::ShaderModuleReflection (const std::vector<uint32_t>& binary)
 {
-    SR::SpirvParser c (binary);
+    RG::Refl::SpirvParser c (binary);
 
-    ubos           = SR::GetUBOsFromBinary (c);
-    samplers       = SR::GetSamplersFromBinary (c);
-    storageBuffers = SR::GetStorageBuffersFromBinary (c);
-    inputs         = SR::GetInputsFromBinary (c);
-    outputs        = SR::GetOutputsFromBinary (c);
-    subpassInputs  = SR::GetSubpassInputsFromBinary (c);
+    ubos           = RG::Refl::GetUBOsFromBinary (c);
+    samplers       = RG::Refl::GetSamplersFromBinary (c);
+    storageBuffers = RG::Refl::GetStorageBuffersFromBinary (c);
+    inputs         = RG::Refl::GetInputsFromBinary (c);
+    outputs        = RG::Refl::GetOutputsFromBinary (c);
+    subpassInputs  = RG::Refl::GetSubpassInputsFromBinary (c);
 }
 
 
@@ -630,13 +630,13 @@ void ShaderModule::Reload ()
     if (readMode == ReadMode::GLSLFilePath) {
         vkDestroyShaderModule (device, handle, nullptr);
 
-        std::optional<std::string> fileContents = Utils::ReadTextFile (fileLocation);
-        if (GVK_ERROR (!fileContents.has_value ())) {
+        std::optional<std::string> fileContents = RG::ReadTextFile (fileLocation);
+        if (RG_ERROR (!fileContents.has_value ())) {
             throw std::runtime_error ("failed to read shader");
         }
 
         std::optional<ShaderKindDescriptor> shaderKindDescriptor = ShaderKindDescriptor::FromExtension (fileLocation.extension ().string ());
-        if (GVK_ERROR (!shaderKindDescriptor.has_value ())) {
+        if (RG_ERROR (!shaderKindDescriptor.has_value ())) {
             return;
         }
 
@@ -647,7 +647,7 @@ void ShaderModule::Reload ()
         parameters.undefines            = undefines;
 
         std::optional<std::vector<uint32_t>> newBinary = CompileFromSourceCode (parameters);
-        if (GVK_ERROR (!newBinary.has_value ())) {
+        if (RG_ERROR (!newBinary.has_value ())) {
             throw std::runtime_error ("failed to compile shader");
         }
 
@@ -662,8 +662,8 @@ void ShaderModule::Reload ()
     } else if (readMode == ReadMode::SPVFilePath) {
         vkDestroyShaderModule (device, handle, nullptr);
 
-        std::optional<std::vector<char>> binaryC = Utils::ReadBinaryFile (fileLocation);
-        if (GVK_ERROR (!binaryC.has_value ())) {
+        std::optional<std::vector<char>> binaryC = RG::ReadBinaryFile (fileLocation);
+        if (RG_ERROR (!binaryC.has_value ())) {
             throw std::runtime_error ("failed to read shader");
         }
 
@@ -678,10 +678,10 @@ void ShaderModule::Reload ()
         binary = code;
 
     } else if (readMode == ReadMode::GLSLString) {
-        GVK_BREAK_STR ("cannot reload shaders from hard coded strings");
+        RG_BREAK_STR ("cannot reload shaders from hard coded strings");
 
     } else {
-        GVK_BREAK_STR ("unknown read mode");
+        RG_BREAK_STR ("unknown read mode");
     }
 }
 
@@ -696,9 +696,9 @@ std::string ShaderKindToString (ShaderKind shaderKind)
         case ShaderKind::Geometry: return "Geometry";
         case ShaderKind::Compute: return "Compute";
         default:
-            GVK_BREAK_STR ("unexpected shaderkind type");
+            RG_BREAK_STR ("unexpected shaderkind type");
             return "";
     }
 }
 
-} // namespace GVK
+} // namespace RG

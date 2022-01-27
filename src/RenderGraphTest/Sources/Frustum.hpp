@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #pragma warning(pop)
 
-namespace GVK {
+namespace RG {
 
 class Frustum {
 public:
@@ -51,6 +51,6 @@ public:
     glm::mat4 GetMatrix () const override;
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

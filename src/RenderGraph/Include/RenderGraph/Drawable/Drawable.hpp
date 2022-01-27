@@ -4,7 +4,7 @@
 #include "RenderGraph/RenderGraphExport.hpp"
 
 
-namespace GVK {
+namespace RG {
 class CommandBuffer;
 }
 
@@ -15,7 +15,7 @@ class RENDERGRAPH_DLL_EXPORT Drawable {
 public:
     virtual ~Drawable ();
 
-    virtual void Record (GVK::CommandBuffer&) const = 0;
+    virtual void Record (RG::CommandBuffer&) const = 0;
 };
 
 } // namespace RG

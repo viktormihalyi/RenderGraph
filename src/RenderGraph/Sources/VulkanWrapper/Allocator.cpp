@@ -8,7 +8,7 @@
 #include <vulkan/vulkan.h>
 
 
-namespace GVK {
+namespace RG {
 
 Allocator::Allocator (VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device)
     : handle { VK_NULL_HANDLE }
@@ -18,7 +18,7 @@ Allocator::Allocator (VkInstance instance, VkPhysicalDevice physicalDevice, VkDe
     allocatorInfo.device                 = device;
     allocatorInfo.instance               = instance;
 
-    if (GVK_ERROR (vmaCreateAllocator (&allocatorInfo, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vmaCreateAllocator (&allocatorInfo, &handle) != VK_SUCCESS)) {
         spdlog::critical ("VmaAllocator creation failed.");
         throw std::runtime_error ("failed to create vma allocator");
     }
@@ -33,4 +33,4 @@ Allocator::~Allocator ()
     handle = nullptr;
 }
 
-} // namespace GVK
+} // namespace RG

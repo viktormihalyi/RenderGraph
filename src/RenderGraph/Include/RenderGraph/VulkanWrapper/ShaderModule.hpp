@@ -12,7 +12,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT ShaderCompileException : public std::runtime_error {
 public:
@@ -34,12 +34,12 @@ std::string ShaderKindToString (ShaderKind);
 
 
 struct RENDERGRAPH_DLL_EXPORT ShaderModuleReflection {
-    std::vector<std::shared_ptr<SR::BufferObject>> ubos;
-    std::vector<SR::Sampler>                       samplers;
-    std::vector<std::shared_ptr<SR::BufferObject>> storageBuffers;
-    std::vector<SR::Input>                         inputs;
-    std::vector<SR::Output>                        outputs;
-    std::vector<SR::SubpassInput>                  subpassInputs;
+    std::vector<std::shared_ptr<RG::Refl::BufferObject>> ubos;
+    std::vector<RG::Refl::Sampler>                       samplers;
+    std::vector<std::shared_ptr<RG::Refl::BufferObject>> storageBuffers;
+    std::vector<RG::Refl::Input>                         inputs;
+    std::vector<RG::Refl::Output>                        outputs;
+    std::vector<RG::Refl::SubpassInput>                  subpassInputs;
 
     ShaderModuleReflection (const std::vector<uint32_t>& binary);
 };
@@ -56,7 +56,7 @@ public:
 
 private:
     VkDevice                        device;
-    GVK::MovablePtr<VkShaderModule> handle;
+    RG::MovablePtr<VkShaderModule> handle;
     ReadMode                        readMode;
     ShaderKind                      shaderKind;
 
@@ -125,6 +125,6 @@ public:
     const std::string& GetSourceCode () const { return sourceCode; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

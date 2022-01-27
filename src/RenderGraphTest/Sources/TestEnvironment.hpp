@@ -16,7 +16,7 @@
 // from vulkan
 #include <vulkan/vulkan.h>
 
-namespace GVK {
+namespace RG {
 class ImageData;
 class PhysicalDevice;
 class Swapchain;
@@ -25,7 +25,7 @@ class CommandPool;
 class Queue;
 class DeviceExtra;
 class Image;
-} // namespace GVK
+} // namespace RG
 
 namespace RG {
 class Presentable;
@@ -53,19 +53,19 @@ protected:
     std::unique_ptr<RG::Window>            window;
     std::shared_ptr<RG::Presentable>       presentable;
 
-    GVK::PhysicalDevice& GetPhysicalDevice ();
-    GVK::Device&         GetDevice ();
-    GVK::CommandPool&    GetCommandPool ();
-    GVK::Queue&          GetGraphicsQueue ();
-    GVK::DeviceExtra&    GetDeviceExtra ();
+    RG::PhysicalDevice& GetPhysicalDevice ();
+    RG::Device&         GetDevice ();
+    RG::CommandPool&    GetCommandPool ();
+    RG::Queue&          GetGraphicsQueue ();
+    RG::DeviceExtra&    GetDeviceExtra ();
     RG::Window&          GetWindow ();
-    GVK::Swapchain&      GetSwapchain ();
+    RG::Swapchain&      GetSwapchain ();
 
     virtual ~TestEnvironmentBase () override = default;
 
-    void CompareImages (const std::string& imageName, const GVK::Image& image, std::optional<VkImageLayout> transitionFrom = std::nullopt);
+    void CompareImages (const std::string& imageName, const RG::Image& image, std::optional<VkImageLayout> transitionFrom = std::nullopt);
 
-    void CompareImages (const std::string& name, const GVK::ImageData& actualImage);
+    void CompareImages (const std::string& name, const RG::ImageData& actualImage);
 };
 
 

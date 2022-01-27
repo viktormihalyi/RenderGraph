@@ -5,7 +5,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace GVK {
+namespace RG {
 
 const VkImageLayout Image::INITIAL_LAYOUT = VK_IMAGE_LAYOUT_UNDEFINED;
 
@@ -66,7 +66,7 @@ Image::Image (VmaAllocator      allocator,
         allocInfo.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
     }
 
-    if (GVK_ERROR (vmaCreateImage (allocator, &imageInfo, &allocInfo, &handle, &allocationHandle, nullptr) != VK_SUCCESS)) {
+    if (RG_ERROR (vmaCreateImage (allocator, &imageInfo, &allocInfo, &handle, &allocationHandle, nullptr) != VK_SUCCESS)) {
         spdlog::critical ("VkImage creation failed.");
         throw std::runtime_error ("failed to create image!");
     }
@@ -224,7 +224,7 @@ Image ImageBuilder::Build () const
                         arrayLayers.has_value () &&
                         loc.has_value ();
 
-    if (GVK_ERROR (!allSet)) {
+    if (RG_ERROR (!allSet)) {
         throw std::runtime_error ("not all values set");
     }
 
@@ -241,4 +241,4 @@ Image ImageBuilder::Build () const
         *loc);
 }
 
-} // namespace GVK
+} // namespace RG

@@ -13,7 +13,7 @@
 #include <thread>
 
 
-namespace GVK {
+namespace RG {
 
 
 RENDERGRAPH_DLL_EXPORT

@@ -53,12 +53,12 @@ using VizHFTests = HiddenWindowTestEnvironment;
 
 TEST_F (VizHFTests, HF1)
 {
-    GVK::DeviceExtra& device        = *env->deviceExtra;
+    RG::DeviceExtra& device        = *env->deviceExtra;
 
-    GVK::Swapchain& swapchain = presentable->GetSwapchain ();
+    RG::Swapchain& swapchain = presentable->GetSwapchain ();
 
-    GVK::Camera   c (glm::vec3 (-1, 0, 0.5f), glm::vec3 (1, 0.0f, 0), window->GetAspectRatio ());
-    GVK::CameraControl cameraControl (c, window->events);
+    RG::Camera   c (glm::vec3 (-1, 0, 0.5f), glm::vec3 (1, 0.0f, 0), window->GetAspectRatio ());
+    RG::CameraControl cameraControl (c, window->events);
 
     RG::GraphSettings s (device, swapchain.GetImageCount ());
     RG::RenderGraph   graph;
@@ -359,7 +359,7 @@ void main ()
     std::shared_ptr<RG::ReadOnlyImageResource>  agy3d     = std::make_unique<RG::ReadOnlyImageResource> (VK_FORMAT_R8_SRGB, 256, 256, 256);
 
     auto& aTable2 = brainRenderOp->compileSettings.attachmentProvider;
-    aTable2->table.push_back ({ "presented", GVK::ShaderKind::Fragment, { presented->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_CLEAR, presented->GetImageViewForFrameProvider (), presented->GetInitialLayout (), presented->GetFinalLayout () } });
+    aTable2->table.push_back ({ "presented", RG::ShaderKind::Fragment, { presented->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_CLEAR, presented->GetImageViewForFrameProvider (), presented->GetInitialLayout (), presented->GetFinalLayout () } });
 
     s.connectionSet.Add (brainRenderOp, presented);
 
@@ -370,17 +370,17 @@ void main ()
     RG::UniformReflection r (s.connectionSet);
 
     auto& table = brainRenderOp->compileSettings.descriptorWriteProvider;
-    table->imageInfos.push_back ({ std::string ("agySampler"), GVK::ShaderKind::Fragment, agy3d->GetSamplerProvider (), agy3d->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL });
-    table->imageInfos.push_back ({ std::string ("matcapSampler"), GVK::ShaderKind::Fragment, matcap->GetSamplerProvider (), matcap->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL });
+    table->imageInfos.push_back ({ std::string ("agySampler"), RG::ShaderKind::Fragment, agy3d->GetSamplerProvider (), agy3d->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL });
+    table->imageInfos.push_back ({ std::string ("matcapSampler"), RG::ShaderKind::Fragment, matcap->GetSamplerProvider (), matcap->GetImageViewForFrameProvider (), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL });
 
 
     // ========================= GRAPH RESOURCE SETUP =========================
 
     graph.Compile (std::move (s));
 
-    matcap->CopyTransitionTransfer (GVK::ImageData (std::filesystem::current_path () / "TestData" / "VizHF" / "matcap.jpg").data);
+    matcap->CopyTransitionTransfer (RG::ImageData (std::filesystem::current_path () / "TestData" / "VizHF" / "matcap.jpg").data);
 
-    std::vector<uint8_t> rawBrainData = GVK::ImageData (std::filesystem::current_path () / "TestData" / "VizHF" / "brain.jpg", 1).data;
+    std::vector<uint8_t> rawBrainData = RG::ImageData (std::filesystem::current_path () / "TestData" / "VizHF" / "brain.jpg", 1).data;
 
     std::vector<uint8_t> transformedBrainData (256 * 256 * 256);
 
@@ -396,8 +396,8 @@ void main ()
     };
 
     {
-        // Utils::DebugTimerLogger l ("transforming volume data");
-        // Utils::TimerScope       s (l);
+        // RG::DebugTimerLogger l ("transforming volume data");
+        // RG::TimerScope       s (l);
         MultithreadedFunction d ([&] (uint32_t threadCount, uint32_t threadIndex) {
             const uint32_t pixelCount = 4096 * 4096;
             for (uint32_t bidx = pixelCount / threadCount * threadIndex; bidx < pixelCount / threadCount * (threadIndex + 1); ++bidx) {
@@ -434,7 +434,7 @@ void main ()
 
     bool quit = false;
 
-    GVK::EventObserver obs;
+    RG::EventObserver obs;
     obs.Observe (window->events.keyPressed, [&] (int32_t key) {
         constexpr uint8_t ESC_CODE = 27;
         if (key == ESC_CODE) {
@@ -459,29 +459,29 @@ void main ()
         }
     });
 
-    r[*brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["VP"] = glm::mat4 (1.f);
-    r[*brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["VP"] = glm::mat4 (1.f);
+    r[*brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["VP"] = glm::mat4 (1.f);
+    r[*brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["VP"] = glm::mat4 (1.f);
 
     obs.Observe (renderer.preSubmitEvent, [&] (RG::RenderGraph&, uint32_t frameIndex, uint64_t deltaNs) {
-        GVK::TimePoint delta (deltaNs);
+        RG::TimePoint delta (deltaNs);
 
         const float dt = static_cast<float> (delta.AsSeconds ());
 
         cameraControl.UpdatePosition (dt);
 
         {
-            r[*brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["viewMatrix"]   = c.GetViewMatrix ();
-            r[*brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["rayDirMatrix"] = c.GetRayDirMatrix ();
-            r[*brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["camPosition"]  = c.GetPosition ();
-            r[*brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["viewDir"]      = c.GetViewDirection ();
-            r[*brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["displayMode"]  = static_cast<uint32_t> (currentDisplayMode);
+            r[*brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["viewMatrix"]   = c.GetViewMatrix ();
+            r[*brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["rayDirMatrix"] = c.GetRayDirMatrix ();
+            r[*brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["camPosition"]  = c.GetPosition ();
+            r[*brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["viewDir"]      = c.GetViewDirection ();
+            r[*brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["displayMode"]  = static_cast<uint32_t> (currentDisplayMode);
 
-            r[*brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["viewMatrix"]  = c.GetViewMatrix ();
-            r[*brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["viewMatrix"]  = c.GetRayDirMatrix ();
-            r[*brainRenderOp][GVK::ShaderKind::Fragment]["Time"]["time"]          = static_cast<float> (GVK::TimePoint::SinceApplicationStart ().AsSeconds ());
-            r[*brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["position"]    = c.GetPosition ();
-            r[*brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["viewDir"]     = c.GetViewDirection ();
-            r[*brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["displayMode"] = static_cast<uint32_t> (currentDisplayMode);
+            r[*brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["viewMatrix"]  = c.GetViewMatrix ();
+            r[*brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["viewMatrix"]  = c.GetRayDirMatrix ();
+            r[*brainRenderOp][RG::ShaderKind::Fragment]["Time"]["time"]          = static_cast<float> (RG::TimePoint::SinceApplicationStart ().AsSeconds ());
+            r[*brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["position"]    = c.GetPosition ();
+            r[*brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["viewDir"]     = c.GetViewDirection ();
+            r[*brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["displayMode"] = static_cast<uint32_t> (currentDisplayMode);
         }
 
         r.Flush (frameIndex);
@@ -494,7 +494,7 @@ void main ()
     renderer.RenderNextRecreatableFrame (graph);
     renderer.RenderNextRecreatableFrame (graph);
 
-    GVK::ImageData sw (GetDeviceExtra (), *swapchain.GetImageObjects ()[0], 0, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    RG::ImageData sw (GetDeviceExtra (), *swapchain.GetImageObjects ()[0], 0, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
     sw.ConvertBGRToRGB ();
 
     CompareImages ("VizHF1_InitialState", sw);
@@ -553,13 +553,13 @@ struct Quadric {
 
 TEST_F (VizHFTests, HF2)
 {
-    GVK::DeviceExtra& device        = *env->deviceExtra;
-    GVK::DeviceExtra& deviceExtra   = device;
+    RG::DeviceExtra& device        = *env->deviceExtra;
+    RG::DeviceExtra& deviceExtra   = device;
 
-    GVK::Swapchain& swapchain = presentable->GetSwapchain ();
+    RG::Swapchain& swapchain = presentable->GetSwapchain ();
 
-    GVK::Camera        c (glm::vec3 (-0.553508, -4.64034, 8.00851), glm::vec3 (0.621111, 0.629845, -0.466387), window->GetAspectRatio ());
-    GVK::CameraControl cameraControl (c, window->events);
+    RG::Camera        c (glm::vec3 (-0.553508, -4.64034, 8.00851), glm::vec3 (0.621111, 0.629845, -0.466387), window->GetAspectRatio ());
+    RG::CameraControl cameraControl (c, window->events);
     c.SetSpeed (3.f);
 
     RG::GraphSettings s (deviceExtra, swapchain.GetImageCount ());
@@ -834,7 +834,7 @@ void main ()
     // ========================= GRAPH CONNECTIONS =========================
 
     auto& aTable2 = brainRenderOp->compileSettings.attachmentProvider;
-    aTable2->table.push_back ({ "presented", GVK::ShaderKind::Fragment, { presented->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_CLEAR, presented->GetImageViewForFrameProvider (), presented->GetInitialLayout (), presented->GetFinalLayout () } });
+    aTable2->table.push_back ({ "presented", RG::ShaderKind::Fragment, { presented->GetFormatProvider (), VK_ATTACHMENT_LOAD_OP_CLEAR, presented->GetImageViewForFrameProvider (), presented->GetInitialLayout (), presented->GetFinalLayout () } });
 
     s.connectionSet.Add (brainRenderOp, presented);
 
@@ -852,7 +852,7 @@ void main ()
 
     bool quit = false;
 
-    GVK::EventObserver obs;
+    RG::EventObserver obs;
     obs.Observe (window->events.keyPressed, [&] (int32_t key) {
         constexpr uint8_t ESC_CODE = 27;
         if (key == ESC_CODE) {
@@ -871,8 +871,8 @@ void main ()
         }
     });
 
-    refl[brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["VP"]   = glm::mat4 (1.f);
-    refl[brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["VP"] = glm::mat4 (1.f);
+    refl[brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["VP"]   = glm::mat4 (1.f);
+    refl[brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["VP"] = glm::mat4 (1.f);
 
     enum class QuadricSurfaceType : uint32_t {
         Diffuse = 0,
@@ -985,26 +985,26 @@ void main ()
         lights[3].powerDensity = glm::vec4 (187 / 255.f, 143 / 255.f, 206 / 255.f, 0) * 100.f;
     }
 
-    refl[brainRenderOp][GVK::ShaderKind::Fragment]["Quadrics"] = quadrics;
-    refl[brainRenderOp][GVK::ShaderKind::Fragment]["Lights"]   = lights;
+    refl[brainRenderOp][RG::ShaderKind::Fragment]["Quadrics"] = quadrics;
+    refl[brainRenderOp][RG::ShaderKind::Fragment]["Lights"]   = lights;
 
     obs.Observe (renderer.preSubmitEvent, [&] (RG::RenderGraph&, uint32_t frameIndex, uint64_t deltaNs) {
-        GVK::TimePoint delta (deltaNs);
+        RG::TimePoint delta (deltaNs);
 
         const float dt = static_cast<float> (delta.AsSeconds ());
 
         cameraControl.UpdatePosition (dt);
 
         {
-            refl[brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["viewMatrix"]   = c.GetViewMatrix ();
-            refl[brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["rayDirMatrix"] = c.GetRayDirMatrix ();
-            refl[brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["camPosition"]  = c.GetPosition ();
-            refl[brainRenderOp][GVK::ShaderKind::Vertex]["Camera"]["viewDir"]      = c.GetViewDirection ();
+            refl[brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["viewMatrix"]   = c.GetViewMatrix ();
+            refl[brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["rayDirMatrix"] = c.GetRayDirMatrix ();
+            refl[brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["camPosition"]  = c.GetPosition ();
+            refl[brainRenderOp][RG::ShaderKind::Vertex]["Camera"]["viewDir"]      = c.GetViewDirection ();
 
-            refl[brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["viewMatrix"]   = c.GetViewMatrix ();
-            refl[brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["rayDirMatrix"] = c.GetRayDirMatrix ();
-            refl[brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["position"]     = c.GetPosition ();
-            refl[brainRenderOp][GVK::ShaderKind::Fragment]["Camera"]["viewDir"]      = c.GetViewDirection ();
+            refl[brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["viewMatrix"]   = c.GetViewMatrix ();
+            refl[brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["rayDirMatrix"] = c.GetRayDirMatrix ();
+            refl[brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["position"]     = c.GetPosition ();
+            refl[brainRenderOp][RG::ShaderKind::Fragment]["Camera"]["viewDir"]      = c.GetViewDirection ();
         }
 
         refl.Flush (frameIndex);
@@ -1017,7 +1017,7 @@ void main ()
     renderer.RenderNextRecreatableFrame (graph);
     renderer.RenderNextRecreatableFrame (graph);
 
-    GVK::ImageData sw (GetDeviceExtra (), *swapchain.GetImageObjects ()[0], 0, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+    RG::ImageData sw (GetDeviceExtra (), *swapchain.GetImageObjects ()[0], 0, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
     sw.ConvertBGRToRGB ();
 
     CompareImages ("VizHF2_InitialState", sw);

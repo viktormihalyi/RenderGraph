@@ -8,7 +8,7 @@
 #include "RenderGraph/Utils/MovablePtr.hpp"
 #include "RenderGraph/VulkanWrapper/VulkanObject.hpp"
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT PipelineBase : public VulkanObject {
 public:
@@ -24,6 +24,6 @@ public:
     virtual operator VkPipeline () const = 0;
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

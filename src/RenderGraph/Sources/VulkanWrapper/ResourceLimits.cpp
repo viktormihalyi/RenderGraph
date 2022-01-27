@@ -1,7 +1,7 @@
 #include "ResourceLimits.hpp"
 
 
-namespace GVK {
+namespace RG {
 
 TBuiltInResource GetDefaultResourceLimits ()
 {
@@ -118,4 +118,4 @@ TBuiltInResource GetDefaultResourceLimits ()
     return result;
 }
 
-} // namespace GVK
+} // namespace RG

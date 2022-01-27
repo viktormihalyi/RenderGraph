@@ -3,7 +3,7 @@
 
 #include "RenderGraph/RenderGraphExport.hpp"
 
-namespace Utils {
+namespace RG {
 
 // TODO replace std::source_location when c++20 happens
 
@@ -13,6 +13,6 @@ struct RENDERGRAPH_DLL_EXPORT SourceLocation {
     const char* function;
 };
 
-} // namespace Utils
+} // namespace RG
 
 #endif

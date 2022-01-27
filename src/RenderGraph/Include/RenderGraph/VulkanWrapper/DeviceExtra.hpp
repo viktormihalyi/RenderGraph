@@ -12,7 +12,7 @@
 #include "vk_mem_alloc.h"
 #pragma warning(pop)
 
-namespace GVK {
+namespace RG {
 
 class RENDERGRAPH_DLL_EXPORT DeviceExtra : public Device {
 public:
@@ -51,6 +51,6 @@ public:
     virtual void Wait () const override { device.Wait (); }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

@@ -8,13 +8,13 @@
 #include <vulkan/vulkan.h>
 
 
-namespace GVK {
+namespace RG {
 
 class DeviceExtra;
 
 class RENDERGRAPH_DLL_EXPORT VulkanObject : public Noncopyable {
 private:
-    GVK::UUID   uuid;
+    RG::UUID   uuid;
     std::string name;
 
 protected:
@@ -33,13 +33,13 @@ public:
 
     const std::string& GetName () const { return name; }
 
-    const GVK::UUID& GetUUID () const { return uuid; }
+    const RG::UUID& GetUUID () const { return uuid; }
 
 private:
     virtual void*        GetHandleForName () const     = 0;
     virtual VkObjectType GetObjectTypeForName () const = 0;
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

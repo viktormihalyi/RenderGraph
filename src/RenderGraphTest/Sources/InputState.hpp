@@ -6,9 +6,9 @@
 
 #include <array>
 
-namespace GVK {
+namespace RG {
 
-//#define ASSERT_ON_KEYS GVK_VERIFY
+//#define ASSERT_ON_KEYS RG_VERIFY
 #define ASSERT_ON_KEYS
 
 class KeyboardState {
@@ -60,6 +60,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

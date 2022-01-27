@@ -12,7 +12,7 @@ namespace FromShaderReflection {
 IDescriptorWriteInfoProvider::~IDescriptorWriteInfoProvider () = default;
 
 
-std::vector<VkDescriptorImageInfo> DescriptorWriteInfoTable::GetDescriptorImageInfos (const std::string& name, GVK::ShaderKind shaderKind, uint32_t layerIndex, uint32_t resourceIndex)
+std::vector<VkDescriptorImageInfo> DescriptorWriteInfoTable::GetDescriptorImageInfos (const std::string& name, RG::ShaderKind shaderKind, uint32_t layerIndex, uint32_t resourceIndex)
 {
     std::vector<ImageEntry> result = imageInfos;
     result.erase (std::remove_if (result.begin (), result.end (), [&] (const auto& entry) {
@@ -29,7 +29,7 @@ std::vector<VkDescriptorImageInfo> DescriptorWriteInfoTable::GetDescriptorImageI
 }
 
 
-std::vector<VkDescriptorBufferInfo> DescriptorWriteInfoTable::GetDescriptorBufferInfos (const std::string& name, GVK::ShaderKind shaderKind, uint32_t frameIndex)
+std::vector<VkDescriptorBufferInfo> DescriptorWriteInfoTable::GetDescriptorBufferInfos (const std::string& name, RG::ShaderKind shaderKind, uint32_t frameIndex)
 {
     std::vector<BufferEntry> result = bufferInfos;
     result.erase (std::remove_if (result.begin (), result.end (), [&] (const auto& entry) {
@@ -49,10 +49,10 @@ std::vector<VkDescriptorBufferInfo> DescriptorWriteInfoTable::GetDescriptorBuffe
 IUpdateDescriptorSets::~IUpdateDescriptorSets () = default;
 
 
-static void UpdateDescriptorSetsFromSamplers (const GVK::ShaderModuleReflection& reflection,
+static void UpdateDescriptorSetsFromSamplers (const RG::ShaderModuleReflection& reflection,
                                               VkDescriptorSet                      dstSet,
                                               uint32_t                             frameIndex,
-                                              GVK::ShaderKind                      shaderKind,
+                                              RG::ShaderKind                      shaderKind,
                                               IDescriptorWriteInfoProvider&        infoProvider,
                                               IUpdateDescriptorSets&               updateInterface)
 {
@@ -62,11 +62,11 @@ static void UpdateDescriptorSetsFromSamplers (const GVK::ShaderModuleReflection&
     imgInfos.reserve (1024);
     result.reserve (1024);
 
-    for (const SR::Sampler& sampler : reflection.samplers) {
+    for (const RG::Refl::Sampler& sampler : reflection.samplers) {
         const uint32_t layerCount = sampler.arraySize;
         for (uint32_t layerIndex = 0; layerIndex < layerCount; ++layerIndex) {
             const std::vector<VkDescriptorImageInfo> tempImgInfos = infoProvider.GetDescriptorImageInfos (sampler.name, shaderKind, layerIndex, frameIndex);
-            if (GVK_ERROR (tempImgInfos.empty ())) {
+            if (RG_ERROR (tempImgInfos.empty ())) {
                 spdlog::error ("Combined sampler \"{}\" (layer {}) has no descriptor bound.", sampler.name, layerIndex);
                 continue;
             }
@@ -77,8 +77,8 @@ static void UpdateDescriptorSetsFromSamplers (const GVK::ShaderModuleReflection&
 
             const int32_t newSize = static_cast<uint32_t> (imgInfos.size ());
 
-            GVK_ASSERT (newSize - currentSize == tempImgInfos.size ());
-            GVK_ASSERT (newSize - currentSize > 0);
+            RG_ASSERT (newSize - currentSize == tempImgInfos.size ());
+            RG_ASSERT (newSize - currentSize > 0);
 
             VkWriteDescriptorSet write = {};
             write.sType                = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -100,10 +100,10 @@ static void UpdateDescriptorSetsFromSamplers (const GVK::ShaderModuleReflection&
 }
 
 
-static void UpdateDescriptorSetsFromUBOs (const GVK::ShaderModuleReflection& reflection,
+static void UpdateDescriptorSetsFromUBOs (const RG::ShaderModuleReflection& reflection,
                                           VkDescriptorSet                      dstSet,
                                           uint32_t                             frameIndex,
-                                          GVK::ShaderKind                      shaderKind,
+                                          RG::ShaderKind                      shaderKind,
                                           IDescriptorWriteInfoProvider&        infoProvider,
                                           IUpdateDescriptorSets&               updateInterface)
 {
@@ -113,9 +113,9 @@ static void UpdateDescriptorSetsFromUBOs (const GVK::ShaderModuleReflection& ref
     bufferInfos.reserve (1024);
     result.reserve (1024);
 
-    for (const std::shared_ptr<SR::BufferObject>& ubo : reflection.ubos) {
+    for (const std::shared_ptr<RG::Refl::BufferObject>& ubo : reflection.ubos) {
         const std::vector<VkDescriptorBufferInfo> tempBufferInfos = infoProvider.GetDescriptorBufferInfos (ubo->name, shaderKind, frameIndex);
-        if (GVK_ERROR (tempBufferInfos.empty ())) {
+        if (RG_ERROR (tempBufferInfos.empty ())) {
             spdlog::error ("Uniform block \"{}\" has no descriptor bound.", ubo->name);
             continue;
         }
@@ -126,8 +126,8 @@ static void UpdateDescriptorSetsFromUBOs (const GVK::ShaderModuleReflection& ref
 
         const int32_t newSize = static_cast<uint32_t> (bufferInfos.size ());
 
-        GVK_ASSERT (newSize - currentSize == tempBufferInfos.size ());
-        GVK_ASSERT (newSize - currentSize > 0);
+        RG_ASSERT (newSize - currentSize == tempBufferInfos.size ());
+        RG_ASSERT (newSize - currentSize > 0);
 
         VkWriteDescriptorSet write = {};
         write.sType                = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -148,10 +148,10 @@ static void UpdateDescriptorSetsFromUBOs (const GVK::ShaderModuleReflection& ref
 }
 
 
-static void UpdateDescriptorSetsFromStorageBuffers (const GVK::ShaderModuleReflection& reflection,
+static void UpdateDescriptorSetsFromStorageBuffers (const RG::ShaderModuleReflection& reflection,
                                                      VkDescriptorSet                      dstSet,
                                                      uint32_t                             frameIndex,
-                                                     GVK::ShaderKind                      shaderKind,
+                                                     RG::ShaderKind                      shaderKind,
                                                      IDescriptorWriteInfoProvider&        infoProvider,
                                                      IUpdateDescriptorSets&               updateInterface)
 {
@@ -161,9 +161,9 @@ static void UpdateDescriptorSetsFromStorageBuffers (const GVK::ShaderModuleRefle
     bufferInfos.reserve (1024);
     result.reserve (1024);
 
-    for (const std::shared_ptr<SR::BufferObject>& storageBuffer : reflection.storageBuffers) {
+    for (const std::shared_ptr<RG::Refl::BufferObject>& storageBuffer : reflection.storageBuffers) {
         const std::vector<VkDescriptorBufferInfo> tempBufferInfos = infoProvider.GetDescriptorBufferInfos (storageBuffer->name, shaderKind, frameIndex);
-        if (GVK_ERROR (tempBufferInfos.empty ())) {
+        if (RG_ERROR (tempBufferInfos.empty ())) {
             spdlog::error ("Uniform block \"{}\" has no descriptor bound.", storageBuffer->name);
             continue;
         }
@@ -174,8 +174,8 @@ static void UpdateDescriptorSetsFromStorageBuffers (const GVK::ShaderModuleRefle
 
         const int32_t newSize = static_cast<uint32_t> (bufferInfos.size ());
 
-        GVK_ASSERT (newSize - currentSize == tempBufferInfos.size ());
-        GVK_ASSERT (newSize - currentSize > 0);
+        RG_ASSERT (newSize - currentSize == tempBufferInfos.size ());
+        RG_ASSERT (newSize - currentSize > 0);
 
         VkWriteDescriptorSet write = {};
         write.sType                = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -196,10 +196,10 @@ static void UpdateDescriptorSetsFromStorageBuffers (const GVK::ShaderModuleRefle
 }
 
 
-static void UpdateDescriptorSetsFromInputAttachments (const GVK::ShaderModuleReflection& reflection,
+static void UpdateDescriptorSetsFromInputAttachments (const RG::ShaderModuleReflection& reflection,
                                                       VkDescriptorSet                      dstSet,
                                                       uint32_t                             frameIndex,
-                                                      GVK::ShaderKind                      shaderKind,
+                                                      RG::ShaderKind                      shaderKind,
                                                       IDescriptorWriteInfoProvider&        infoProvider,
                                                       IUpdateDescriptorSets&               updateInterface)
 {
@@ -211,11 +211,11 @@ static void UpdateDescriptorSetsFromInputAttachments (const GVK::ShaderModuleRef
     bufferInfos.reserve (1024);
     result.reserve (1024);
 
-    for (const SR::SubpassInput& subpassInput : reflection.subpassInputs) {
+    for (const RG::Refl::SubpassInput& subpassInput : reflection.subpassInputs) {
         const uint32_t layerCount = subpassInput.arraySize;
         for (uint32_t layerIndex = 0; layerIndex < layerCount; ++layerIndex) {
             const std::vector<VkDescriptorImageInfo> tempImgInfos = infoProvider.GetDescriptorImageInfos (subpassInput.name, shaderKind, layerIndex, frameIndex);
-            if (GVK_ERROR (tempImgInfos.empty ())) {
+            if (RG_ERROR (tempImgInfos.empty ())) {
                 spdlog::error ("Input attachment \"{}\" (layer {}) has no descriptor bound.", subpassInput.name, layerIndex);
                 continue;
             }
@@ -226,8 +226,8 @@ static void UpdateDescriptorSetsFromInputAttachments (const GVK::ShaderModuleRef
 
             const int32_t newSize = static_cast<uint32_t> (imgInfos.size ());
 
-            GVK_ASSERT (newSize - currentSize == tempImgInfos.size ());
-            GVK_ASSERT (newSize - currentSize > 0);
+            RG_ASSERT (newSize - currentSize == tempImgInfos.size ());
+            RG_ASSERT (newSize - currentSize > 0);
 
             VkWriteDescriptorSet write = {};
             write.sType                = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -249,10 +249,10 @@ static void UpdateDescriptorSetsFromInputAttachments (const GVK::ShaderModuleRef
 }
 
 
-void WriteDescriptors (const GVK::ShaderModuleReflection& reflection,
+void WriteDescriptors (const RG::ShaderModuleReflection& reflection,
                        VkDescriptorSet                      dstSet,
                        uint32_t                             frameIndex,
-                       GVK::ShaderKind                      shaderKind,
+                       RG::ShaderKind                      shaderKind,
                        IDescriptorWriteInfoProvider&        infoProvider,
                        IUpdateDescriptorSets&               updateInterface)
 {
@@ -263,25 +263,25 @@ void WriteDescriptors (const GVK::ShaderModuleReflection& reflection,
 }
 
 
-static VkShaderStageFlags GetShaderStageFromShaderKind (GVK::ShaderKind shaderKind)
+static VkShaderStageFlags GetShaderStageFromShaderKind (RG::ShaderKind shaderKind)
 {
     switch (shaderKind) {
-        case GVK::ShaderKind::Vertex: return VK_SHADER_STAGE_VERTEX_BIT;
-        case GVK::ShaderKind::Fragment: return VK_SHADER_STAGE_FRAGMENT_BIT;
-        case GVK::ShaderKind::Geometry: return VK_SHADER_STAGE_GEOMETRY_BIT;
-        case GVK::ShaderKind::TessellationControl: return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-        case GVK::ShaderKind::TessellationEvaluation: return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-        case GVK::ShaderKind::Compute: return VK_SHADER_STAGE_COMPUTE_BIT;
-        default: GVK_BREAK_STR ("unexpected shaderkind type"); return VK_SHADER_STAGE_ALL;
+        case RG::ShaderKind::Vertex: return VK_SHADER_STAGE_VERTEX_BIT;
+        case RG::ShaderKind::Fragment: return VK_SHADER_STAGE_FRAGMENT_BIT;
+        case RG::ShaderKind::Geometry: return VK_SHADER_STAGE_GEOMETRY_BIT;
+        case RG::ShaderKind::TessellationControl: return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+        case RG::ShaderKind::TessellationEvaluation: return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+        case RG::ShaderKind::Compute: return VK_SHADER_STAGE_COMPUTE_BIT;
+        default: RG_BREAK_STR ("unexpected shaderkind type"); return VK_SHADER_STAGE_ALL;
     }
 }
 
 
-std::vector<VkDescriptorSetLayoutBinding> GetLayout (const GVK::ShaderModuleReflection& reflection, GVK::ShaderKind shaderKind)
+std::vector<VkDescriptorSetLayoutBinding> GetLayout (const RG::ShaderModuleReflection& reflection, RG::ShaderKind shaderKind)
 {
     std::vector<VkDescriptorSetLayoutBinding> result;
 
-    for (const SR::Sampler& sampler : reflection.samplers) {
+    for (const RG::Refl::Sampler& sampler : reflection.samplers) {
         VkDescriptorSetLayoutBinding bin = {};
         bin.binding                      = sampler.binding;
         bin.descriptorType               = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -291,7 +291,7 @@ std::vector<VkDescriptorSetLayoutBinding> GetLayout (const GVK::ShaderModuleRefl
         result.push_back (bin);
     }
 
-    for (const std::shared_ptr<SR::BufferObject>& ubo : reflection.ubos) {
+    for (const std::shared_ptr<RG::Refl::BufferObject>& ubo : reflection.ubos) {
         VkDescriptorSetLayoutBinding bin = {};
         bin.binding                      = ubo->binding;
         bin.descriptorType               = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -301,7 +301,7 @@ std::vector<VkDescriptorSetLayoutBinding> GetLayout (const GVK::ShaderModuleRefl
         result.push_back (bin);
     }
 
-    for (const std::shared_ptr<SR::BufferObject>& storageBuffer : reflection.storageBuffers) {
+    for (const std::shared_ptr<RG::Refl::BufferObject>& storageBuffer : reflection.storageBuffers) {
         VkDescriptorSetLayoutBinding bin = {};
         bin.binding                      = storageBuffer->binding;
         bin.descriptorType               = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -311,7 +311,7 @@ std::vector<VkDescriptorSetLayoutBinding> GetLayout (const GVK::ShaderModuleRefl
         result.push_back (bin);
     }
 
-    for (const SR::SubpassInput& subpassInput : reflection.subpassInputs) {
+    for (const RG::Refl::SubpassInput& subpassInput : reflection.subpassInputs) {
         VkDescriptorSetLayoutBinding bin = {};
         bin.binding                      = subpassInput.binding;
         bin.descriptorType               = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;

@@ -5,7 +5,7 @@
 #include <utility>
 
 
-namespace GVK {
+namespace RG {
 
 template<typename T>
 class MovablePtr {
@@ -54,7 +54,7 @@ public:
     const T* operator& () const { return &ptr; }
 };
 
-} // namespace GVK
+} // namespace RG
 
 
 #endif

@@ -11,13 +11,13 @@
 
 #include <vector>
 
-namespace GVK {
+namespace RG {
 
 class CommandBuffer;
 
 class RENDERGRAPH_DLL_EXPORT Queue : public Noncopyable, public Nonmovable {
 private:
-    GVK::MovablePtr<VkQueue> handle;
+    RG::MovablePtr<VkQueue> handle;
 
 public:
     Queue (VkDevice device, uint32_t index)
@@ -60,6 +60,6 @@ public:
 
 RENDERGRAPH_DLL_EXPORT extern Queue dummyQueue;
 
-} // namespace GVK
+} // namespace RG
 
 #endif

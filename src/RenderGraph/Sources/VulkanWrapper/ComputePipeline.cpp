@@ -3,7 +3,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace GVK {
+namespace RG {
 
 ComputePipeline::ComputePipeline (VkDevice            device,
                                   VkPipelineLayout    pipelineLayout,
@@ -19,7 +19,7 @@ ComputePipeline::ComputePipeline (VkDevice            device,
     createInfo.basePipelineHandle          = VK_NULL_HANDLE;
     createInfo.basePipelineIndex           = -1;
 
-    if (GVK_ERROR (vkCreateComputePipelines (device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateComputePipelines (device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
         spdlog::critical ("VkPipeline creation failed.");
         throw std::runtime_error ("failed to create pipeline");
     }

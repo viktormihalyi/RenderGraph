@@ -3,10 +3,10 @@
 
 #include <glslang/Public/ShaderLang.h>
 
-namespace GVK {
+namespace RG {
 
 TBuiltInResource GetDefaultResourceLimits ();
 
-} // namespace GVK
+} // namespace RG
 
 #endif

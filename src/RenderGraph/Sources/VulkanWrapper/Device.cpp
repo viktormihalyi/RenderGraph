@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 
-namespace GVK {
+namespace RG {
 
 
 Device::~Device () = default;
@@ -55,7 +55,7 @@ DeviceObject::DeviceObject (VkPhysicalDevice physicalDevice, std::vector<uint32_
     createInfo.enabledLayerCount       = 0;       // deprecated
     createInfo.ppEnabledLayerNames     = nullptr; // deprecated
 
-    if (GVK_ERROR (vkCreateDevice (physicalDevice, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
+    if (RG_ERROR (vkCreateDevice (physicalDevice, &createInfo, nullptr, &handle) != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create device");
     }
 }
@@ -71,4 +71,4 @@ DeviceObject::~DeviceObject ()
 }
 
 
-} // namespace GVK
+} // namespace RG

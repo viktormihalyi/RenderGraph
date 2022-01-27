@@ -11,7 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #pragma warning(pop)
 
-namespace GVK {
+namespace RG {
 
 class GlobalUpVectorProvider {
 public:
@@ -146,7 +146,7 @@ void Camera::Move (Camera::MovementDirection dir, float dt)
             break;
 
         default:
-            GVK_BREAK ();
+            RG_BREAK ();
             break;
     }
 
@@ -167,7 +167,7 @@ void Camera::ProcessMouseInput (const glm::vec2& delta)
 void Camera::SetAspectRatio (float value)
 {
     PerspectiveFrustum* f = dynamic_cast<PerspectiveFrustum*> (frustum.get ());
-    if (GVK_ERROR (f == nullptr)) {
+    if (RG_ERROR (f == nullptr)) {
         return;
     }
 
@@ -180,7 +180,7 @@ void Camera::SetAspectRatio (float value)
 float Camera::GetBackPlane () const
 {
     PerspectiveFrustum* f = dynamic_cast<PerspectiveFrustum*> (frustum.get ());
-    if (GVK_ERROR (f == nullptr)) {
+    if (RG_ERROR (f == nullptr)) {
         return 0.f;
     }
 
@@ -191,7 +191,7 @@ float Camera::GetBackPlane () const
 float Camera::GetFrontPlane () const
 {
     PerspectiveFrustum* f = dynamic_cast<PerspectiveFrustum*> (frustum.get ());
-    if (GVK_ERROR (f == nullptr)) {
+    if (RG_ERROR (f == nullptr)) {
         return 0.f;
     }
 
@@ -202,7 +202,7 @@ float Camera::GetFrontPlane () const
 void Camera::SetFrontAndBackPlane (float front, float back)
 {
     PerspectiveFrustum* f = dynamic_cast<PerspectiveFrustum*> (frustum.get ());
-    if (GVK_ERROR (f == nullptr)) {
+    if (RG_ERROR (f == nullptr)) {
         return;
     }
 
@@ -212,4 +212,4 @@ void Camera::SetFrontAndBackPlane (float front, float back)
     InvalidateMatrices ();
 }
 
-} // namespace GVK
+} // namespace RG

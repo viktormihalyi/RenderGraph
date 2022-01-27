@@ -1,6 +1,6 @@
 #include "Time.hpp"
 
-namespace GVK {
+namespace RG {
 
 const std::chrono::time_point<TimePoint::Clock> TimePoint::ApplicationStartTime (TimePoint::Clock::now ());
 

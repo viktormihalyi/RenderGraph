@@ -7,12 +7,12 @@
 #include "RenderGraph/Utils/MovablePtr.hpp"
 #include "VulkanObject.hpp"
 
-namespace GVK {
+namespace RG {
 
 class /* RENDERGRAPH_DLL_EXPORT */ Semaphore : public VulkanObject {
 private:
     VkDevice                     device;
-    GVK::MovablePtr<VkSemaphore> handle;
+    RG::MovablePtr<VkSemaphore> handle;
 
     static VkSemaphore CreateSemaphore (VkDevice device)
     {
@@ -20,7 +20,7 @@ private:
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType                 = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         semaphoreInfo.flags                 = 0;
-        if (GVK_ERROR (vkCreateSemaphore (device, &semaphoreInfo, nullptr, &handle) != VK_SUCCESS)) {
+        if (RG_ERROR (vkCreateSemaphore (device, &semaphoreInfo, nullptr, &handle) != VK_SUCCESS)) {
             throw std::runtime_error ("failed to create semaphore");
         }
         return handle;
@@ -52,6 +52,6 @@ public:
     }
 };
 
-} // namespace GVK
+} // namespace RG
 
 #endif

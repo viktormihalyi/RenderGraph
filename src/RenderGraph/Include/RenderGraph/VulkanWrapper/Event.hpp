@@ -8,10 +8,10 @@
 
 namespace VW {
 
-class RENDERGRAPH_DLL_EXPORT Event : public GVK::VulkanObject {
+class RENDERGRAPH_DLL_EXPORT Event : public RG::VulkanObject {
 private:
     VkDevice                 device;
-    GVK::MovablePtr<VkEvent> handle;
+    RG::MovablePtr<VkEvent> handle;
 
 public:
     Event (VkDevice device);

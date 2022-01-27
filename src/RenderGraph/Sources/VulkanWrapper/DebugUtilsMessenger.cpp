@@ -1,7 +1,7 @@
 #include "DebugUtilsMessenger.hpp"
 #include "VulkanFunctionGetter.hpp"
 
-namespace GVK {
+namespace RG {
 
 const DebugUtilsMessenger::Settings DebugUtilsMessenger::defaultSettings {
     true,
@@ -44,7 +44,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL DebugUtilsMessenger::debugCallback (VkDebugUtilsM
                                                                    const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
                                                                    void*                                       userData)
 {
-    if (GVK_VERIFY (userData != nullptr)) {
+    if (RG_VERIFY (userData != nullptr)) {
         reinterpret_cast<DebugUtilsMessenger*> (userData)->callback (messageSeverity, messageType, callbackData);
     }
 
@@ -78,7 +78,7 @@ DebugUtilsMessenger::DebugUtilsMessenger (VkInstance instance, const Callback& c
     createInfo.pUserData       = this;
 
     VkResult result = GetVulkanFunction<PFN_vkCreateDebugUtilsMessengerEXT> (instance, "vkCreateDebugUtilsMessengerEXT") (instance, &createInfo, nullptr, &handle);
-    if (GVK_ERROR (result != VK_SUCCESS)) {
+    if (RG_ERROR (result != VK_SUCCESS)) {
         throw std::runtime_error ("failed to create debug utils messenger");
     }
 }
@@ -90,4 +90,4 @@ DebugUtilsMessenger::~DebugUtilsMessenger ()
     handle = nullptr;
 }
 
-} // namespace GVK
+} // namespace RG

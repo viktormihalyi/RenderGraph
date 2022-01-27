@@ -56,31 +56,31 @@ void testDebugCallback (VkDebugUtilsMessageSeverityFlagBitsEXT      messageSever
 }
 
 
-GVK::PhysicalDevice& TestEnvironmentBase::GetPhysicalDevice ()
+RG::PhysicalDevice& TestEnvironmentBase::GetPhysicalDevice ()
 {
     return *env->physicalDevice;
 }
 
 
-GVK::Device& TestEnvironmentBase::GetDevice ()
+RG::Device& TestEnvironmentBase::GetDevice ()
 {
     return *env->device;
 }
 
 
-GVK::CommandPool& TestEnvironmentBase::GetCommandPool ()
+RG::CommandPool& TestEnvironmentBase::GetCommandPool ()
 {
     return *env->commandPool;
 }
 
 
-GVK::Queue& TestEnvironmentBase::GetGraphicsQueue ()
+RG::Queue& TestEnvironmentBase::GetGraphicsQueue ()
 {
     return *env->graphicsQueue;
 }
 
 
-GVK::DeviceExtra& TestEnvironmentBase::GetDeviceExtra ()
+RG::DeviceExtra& TestEnvironmentBase::GetDeviceExtra ()
 {
     return *env->deviceExtra;
 }
@@ -92,13 +92,13 @@ RG::Window& TestEnvironmentBase::GetWindow ()
 }
 
 
-GVK::Swapchain& TestEnvironmentBase::GetSwapchain ()
+RG::Swapchain& TestEnvironmentBase::GetSwapchain ()
 {
     return presentable->GetSwapchain ();
 }
 
 
-void TestEnvironmentBase::CompareImages (const std::string& imageName, const GVK::Image& image, std::optional<VkImageLayout> transitionFrom)
+void TestEnvironmentBase::CompareImages (const std::string& imageName, const RG::Image& image, std::optional<VkImageLayout> transitionFrom)
 {
     if (transitionFrom.has_value ()) {
         TransitionImageLayout (GetDeviceExtra (), image, *transitionFrom, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
@@ -116,13 +116,13 @@ void TestEnvironmentBase::CompareImages (const std::string& imageName, const GVK
 }
 
 
-void TestEnvironmentBase::CompareImages (const std::string& name, const GVK::ImageData& actualImage)
+void TestEnvironmentBase::CompareImages (const std::string& name, const RG::ImageData& actualImage)
 {
-    std::optional<GVK::ImageData> referenceImage;
+    std::optional<RG::ImageData> referenceImage;
     if (std::filesystem::exists (ReferenceImagesFolder / (name + ".png")))
         referenceImage.emplace (ReferenceImagesFolder / (name + ".png"));
 
-    std::optional<GVK::ImageData::ComparisonResult> comparison;
+    std::optional<RG::ImageData::ComparisonResult> comparison;
     if (referenceImage.has_value ())
         comparison = referenceImage->CompareTo (actualImage);
 
@@ -143,7 +143,7 @@ void TestEnvironmentBase::CompareImages (const std::string& name, const GVK::Ima
         actualImage.SaveTo (outPath);
 
         if (comparison.has_value ()) {
-            if (GVK_VERIFY (comparison->diffImage != nullptr)) {
+            if (RG_VERIFY (comparison->diffImage != nullptr)) {
                 const std::filesystem::path outPathDiff = TempFolder / (name + "_Diff.png");
                 std::cout << "Saving " << outPathDiff.string () << "..." << std::endl;
                 comparison->diffImage->SaveTo (outPathDiff);
@@ -169,7 +169,7 @@ void ShownWindowTestEnvironment::SetUp ()
 {
     window      = std::make_unique<RG::GLFWWindow> ();
     env         = std::make_unique<RG::VulkanEnvironment> (testDebugCallback, RG::GetGLFWInstanceExtensions (), std::vector<const char*> { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME });
-    presentable = std::make_unique<RG::Presentable> (*env, *window, std::make_unique<GVK::DefaultSwapchainSettings> ());
+    presentable = std::make_unique<RG::Presentable> (*env, *window, std::make_unique<RG::DefaultSwapchainSettings> ());
 }
 
 
@@ -185,7 +185,7 @@ void HiddenWindowTestEnvironment::SetUp ()
 {
     window      = std::make_unique<RG::HiddenGLFWWindow> ();
     env         = std::make_unique<RG::VulkanEnvironment> (testDebugCallback, RG::GetGLFWInstanceExtensions (), std::vector<const char*> { VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME });
-    presentable = std::make_unique<RG::Presentable> (*env, *window, std::make_unique<GVK::DefaultSwapchainSettings> ());
+    presentable = std::make_unique<RG::Presentable> (*env, *window, std::make_unique<RG::DefaultSwapchainSettings> ());
 }
 
 
