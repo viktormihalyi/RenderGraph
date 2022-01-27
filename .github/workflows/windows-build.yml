@@ -1,0 +1,45 @@
+name: Windows Build
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        buildType: [Debug, Release]
+        unityBuild: [OFF]
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: cache-vulkansdk
+      id: cache-vulkansdk
+      uses: actions/cache@v1
+      with:
+        path: "VulkanSDK"
+        key: VulkanSDK-1.2.162.0-Installer
+        
+    - name: Setup Vulkan SDK
+      if: steps.cache-vulkansdk.outputs.cache-hit != 'true'
+      run: |
+        Invoke-WebRequest -Uri https://sdk.lunarg.com/sdk/download/1.2.162.0/windows/VulkanSDK-1.2.162.0-Installer.exe?Human=true -OutFile VulkanSDK-1.2.162.0-Installer.exe
+        7z x -aoa ./VulkanSDK-1.2.162.0-Installer.exe -oVulkanSDK
+        Remove-Item .\VulkanSDK\Demos, .\VulkanSDK\Samples, .\VulkanSDK\Third-Party, .\VulkanSDK\Tools, .\VulkanSDK\Tools32, .\VulkanSDK\Bin32, .\VulkanSDK\Lib32 -Recurse
+
+    - name: Configure CMake
+      run: |
+        $env:VULKAN_SDK="$(pwd)/VulkanSDK"
+        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.buildType}}
+  
+    - name: Build
+      run: |
+        cmake --build ${{github.workspace}}/build --config ${{matrix.buildType}} --parallel

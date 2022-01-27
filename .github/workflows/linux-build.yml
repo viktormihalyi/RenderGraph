@@ -1,0 +1,56 @@
+name: Linux Build
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        buildType: [Debug, Release]
+        compiler:
+          - { CC: gcc-10,   CXX: g++-10 }
+          - { CC: clang-10, CXX: clang++-10 }
+        unityBuild: [OFF]
+        include:
+            - buildType: Debug
+              compiler: { CC: clang-10, CXX: clang++-10 }
+              unityBuild: ON
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Add Vulkan SDK package
+      run: |
+        wget -qO - http://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
+        sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-bionic.list http://packages.lunarg.com/vulkan/lunarg-vulkan-bionic.list
+        sudo apt-get update
+    
+    - name: Install system dependencies
+      run: sudo apt-get install ${{ matrix.compiler.CC }} vulkan-sdk ninja-build libgl1-mesa-dev xorg-dev libxcb-render-util0-dev libxcb-xkb-dev libxcb-icccm4-dev libxcb-image0-dev libxcb-keysyms1-dev libxcb-xinerama0-dev libx11-xcb-dev libxcb-dri3-dev libxcb-randr0-dev libxcb-shape0-dev libxcb-sync-dev libxcb-util-dev libxcb-xfixes0-dev
+  
+    - name: Configure CMake
+      env:
+        CC: ${{ matrix.compiler.CC }}
+        CXX: ${{ matrix.compiler.CXX }}
+        CONAN_SYSREQUIRES_MODE: enabled
+      run: |
+        cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.buildType}} -DCMAKE_UNITY_BUILD=${{matrix.unityBuild}} -DUNITY_BUILD_BATCH_SIZE=0
+      
+    - name: Build
+      run: |
+        cmake --build ${{github.workspace}}/build --parallel
+
+    - name: Run tests
+      working-directory: ${{github.workspace}}/build/bin
+      run: |
+        ./RenderGraphTest --gtest_filter=Empty.*:RenderGraphPassTest.*
