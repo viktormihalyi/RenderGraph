@@ -51,7 +51,7 @@ public:
 
 class RENDERGRAPH_DLL_EXPORT Swapchain {
 public:
-    virtual ~Swapchain () = default;
+    virtual ~Swapchain ();
 
     virtual VkFormat                                         GetImageFormat () const  = 0;
     virtual uint32_t                                         GetImageCount () const   = 0;

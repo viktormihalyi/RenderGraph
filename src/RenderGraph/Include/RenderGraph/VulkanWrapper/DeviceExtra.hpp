@@ -33,6 +33,8 @@ public:
     {
     }
 
+    virtual ~DeviceExtra () override;
+
     const Instance&    GetInstance () const { return instance; }
     const Device&      GetDevice () const { return device; }
     const CommandPool& GetCommandPool () const { return commandPool; }

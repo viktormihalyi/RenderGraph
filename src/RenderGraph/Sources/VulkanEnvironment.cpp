@@ -320,4 +320,10 @@ bool VulkanEnvironment::CheckForPhsyicalDeviceSupport (const Presentable& presen
     return physicalDevice->CheckSurfaceSupported (surface);
 }
 
+
+DeviceExtra::~DeviceExtra () = default;
+
+Swapchain::~Swapchain () = default;
+
+
 } // namespace RG
